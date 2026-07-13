@@ -3,7 +3,7 @@
 > A deterministic, outside-in digital brand audit framework. 195 criteria. Zero AI in the scoring loop. Same inputs, same output, every time.
 
 **Author:** Adhit Satish | **Version:** v1.1 | **Built:** 2026  
-**Contact:** adhitsatish903@gmail.com
+**Contact:** adhitsatish@gmail.com
 
 ---
 
