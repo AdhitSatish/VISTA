@@ -1,5 +1,47 @@
 # VISTA Calculator Changelog
 
+## v1.4 -- Premium Visual Redesign (2026-07-13)
+
+**What changed:** Full visual overhaul from the ground up. Every pixel reconsidered. The application now looks and feels like a high-budget, world-class product.
+
+**Why:** The previous design was functional but visually generic. The data and scores are the core value of VISTA. They should be the wow factor, not an afterthought. This version makes the output something worth showing.
+
+**Design system:**
+- Dark theme throughout: background #0F1117 (deep charcoal, not flat black), cards at #161C2B and #1C2338
+- Brand accent: #03AF97 (GINGO teal-green) on all active states, scores, progress fills, chart elements, and CTAs
+- Full CSS variable token system: color, spacing, radius, and elevation all consistent
+- Premium system font stack (-apple-system, BlinkMacSystemFont, Segoe UI, Inter)
+- Styled scrollbars, green glow focus states, no default browser chrome anywhere
+
+**Data visualization (the hero):**
+- Circular SVG progress ring for the overall VISTA score: animated fill, glow filter, color-shifts by score range (red below 40, amber 40-59, green 60-79, teal 80+)
+- Hexagonal SVG radar chart for all 6 dimensions: concentric grid lines, animated path drawing, semi-transparent brand green fill
+- Horizontal animated bar chart for every sub-component, grouped by dimension, bars colored by score range
+- Dimension score cards with thin animated progress bars and score badges
+
+**Criterion cards:**
+- Dark elevated cards with subtle border, hover state
+- Criterion ID badge and tag pill in the header
+- Collapsible hint with chevron toggle ("How to score this")
+- All score inputs styled as pill selectors (yes/no/na, tri-state, checklist checkboxes, M-anchor 5-column grid) -- no default browser radio buttons visible
+- Evidence note textarea with expand toggle, dark-styled
+- N/A criteria shown at reduced opacity with informational label
+
+**Tab navigation:**
+- Sticky tab bar at the top, always visible on scroll
+- Active tab highlighted with brand green underline
+- Each tab shows dimension name and live completion percentage
+
+**Summary section:**
+- Two-column layout: score ring and radar chart on the left, dimension cards on the right
+- Full-width sub-component bar chart below
+- Styled flag/alert stack: red cards for critical issues, amber for caution, teal for informational
+- Export controls styled as proper button components
+
+**Files changed:** index.html (root, serves GitHub Pages), 03_Calculator/index.html (source)
+
+---
+
 ## v1.3 -- English Quality Pass (2026-07-13)
 
 **What changed:** English quality fixes across 20 specific criteria, plus a UX improvement to the brand launch year input field in the Summary and Export section.

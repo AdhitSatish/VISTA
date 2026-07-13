@@ -1,369 +1,1186 @@
 <!-- VISTA, Visibility Intelligence & Strategic Trust Assessment. Methodology and instrument authored by Adhit Satish. 2026. -->
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="author" content="Adhit Satish">
 <title>VISTA Calculator</title>
 <style>
-  /* =====================================================
-     VISTA CALCULATOR - Dark Theme (Oblivion edition)
-     Palette: deep-black bg / white text / orange accent
-     ===================================================== */
-  :root {
-    --bg:   #060a0d;
-    --bg-1: #0b1218;
-    --bg-2: #101a22;
-    --fg:   #dde4eb;
-    --fg-2: #8aa0b4;
-    --muted:#3d5264;
-    --accent:#e28f26;
-    --accent-dim:rgba(226,143,38,0.10);
-    --accent-border:rgba(226,143,38,0.30);
-    --line: rgba(255,255,255,0.055);
-    --line-strong:rgba(255,255,255,0.11);
-    --gap:  #d9603a;
-    --ok:   #52c178;
-    --r:    10px;
-    --r-sm: 6px;
-    --r-pill:20px;
+
+:root {
+  --bg: #0F1117;
+  --bg-card: #161C2B;
+  --bg-card-2: #1C2338;
+  --bg-input: #141929;
+  --fg: #E8ECF0;
+  --fg-2: #8B9BB0;
+  --fg-muted: #4E5A6D;
+  --accent: #03AF97;
+  --accent-dim: rgba(3,175,151,0.08);
+  --accent-border: rgba(3,175,151,0.28);
+  --accent-glow: rgba(3,175,151,0.18);
+  --line: rgba(255,255,255,0.058);
+  --line-strong: rgba(255,255,255,0.10);
+  --red: #EF4444;
+  --amber: #F59E0B;
+  --green: #22C55E;
+  --r: 12px;
+  --r-sm: 8px;
+  --r-pill: 100px;
+  --header-h: 58px;
+  --tab-h: 48px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.10); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
+
+/* ---- Focus ---- */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---- HEADER ---- */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-h);
+  padding: 0 36px;
+  background: rgba(15,17,23,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+.header-brand { display: flex; flex-direction: column; gap: 2px; }
+.header-logo {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+.header-logo em { color: var(--accent); font-style: normal; }
+.header-sub {
+  font-size: 9px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+.header-status {
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--fg-muted);
+}
+
+/* ---- TABS ---- */
+nav.tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 28px;
+  background: rgba(15,17,23,0.88);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: var(--header-h);
+  z-index: 20;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+nav.tabs::-webkit-scrollbar { display: none; }
+nav.tabs button {
+  position: relative;
+  background: transparent;
+  border: 0;
+  padding: 0 16px;
+  height: var(--tab-h);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.15s;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+nav.tabs button::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 12px;
+  right: 12px;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: transparent;
+  transition: background 0.15s;
+}
+nav.tabs button:hover { color: var(--fg-2); }
+nav.tabs button.active { color: var(--accent); }
+nav.tabs button.active::after { background: var(--accent); }
+.tab-count {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  text-transform: none;
+  font-weight: 400;
+  opacity: 0.55;
+}
+
+/* ---- MAIN LAYOUT ---- */
+main {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  min-height: calc(100vh - var(--header-h) - var(--tab-h));
+}
+main.summary-view { grid-template-columns: 1fr; }
+
+section.panel {
+  min-width: 0;
+  padding: 32px 40px 100px;
+}
+aside.radar-rail {
+  background: var(--bg-card);
+  border-left: 1px solid var(--line);
+  align-self: stretch;
+}
+.radar-card {
+  position: sticky;
+  top: calc(var(--header-h) + var(--tab-h));
+  padding: 24px 20px;
+}
+
+/* ---- TYPOGRAPHY ---- */
+.dim-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.dim-code-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--bg);
+  background: var(--accent);
+  padding: 3px 9px;
+  border-radius: 6px;
+}
+.dim-title {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: var(--fg);
+}
+.dim-intro {
+  font-size: 13px;
+  color: var(--fg-2);
+  margin-bottom: 24px;
+  line-height: 1.6;
+  max-width: 680px;
+}
+
+/* ---- STICKY PROGRESS BAR ---- */
+.dim-sticky {
+  position: sticky;
+  top: calc(var(--header-h) + var(--tab-h));
+  z-index: 10;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  padding: 10px 0 12px;
+  margin-bottom: 28px;
+}
+.dim-sticky-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.dim-sticky-inner .dl {
+  font-size: 10px;
+  color: var(--fg-muted);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+.dim-sticky-inner .dbar {
+  flex: 1;
+  height: 3px;
+  background: var(--line-strong);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.dim-sticky-inner .dbar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), rgba(3,175,151,0.7));
+  border-radius: 3px;
+  transition: width 0.4s cubic-bezier(0.16,1,0.3,1);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+.dim-sticky-inner .dc {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--fg-2);
+  font-variant-numeric: tabular-nums;
+}
+.dim-sticky-inner .dt {
+  font-size: 11px;
+  color: var(--fg-muted);
+  padding-left: 12px;
+  border-left: 1px solid var(--line-strong);
+  white-space: nowrap;
+}
+
+/* ---- TYPE LEGEND ---- */
+.type-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  font-size: 11px;
+  color: var(--fg-2);
+  margin-bottom: 24px;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+}
+.type-legend b { color: var(--accent); font-size: 10px; letter-spacing: 0.5px; }
+
+/* ---- SUBCOMPONENT ---- */
+.subcomp {
+  margin-bottom: 8px;
+}
+.subcomp-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.15s, background 0.15s;
+  margin-bottom: 2px;
+}
+.subcomp-header:hover {
+  border-color: var(--line-strong);
+  background: var(--bg-card-2);
+}
+.subcomp h3 {
+  flex: 1;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--fg-2);
+  margin: 0;
+}
+.subcomp-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--fg-muted);
+  font-size: 14px;
+  padding: 0;
+  transition: transform 0.2s cubic-bezier(0.16,1,0.3,1);
+  font-family: inherit;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+.subcomp.collapsed .subcomp-toggle { transform: rotate(-90deg); }
+.subcomp.collapsed .sc-meta,
+.subcomp.collapsed .criterion-card { display: none; }
+
+.sc-badge {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--fg-muted);
+  background: var(--bg-input);
+  padding: 2px 10px;
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+  border: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+}
+.sc-badge.done {
+  background: rgba(3,175,151,0.10);
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+.sc-meta {
+  font-size: 11px;
+  color: var(--fg-muted);
+  padding: 6px 16px 10px;
+  letter-spacing: 0.2px;
+}
+
+/* ---- CRITERION CARDS ---- */
+.criterion-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 18px 20px;
+  margin-bottom: 6px;
+  transition: border-color 0.15s;
+}
+.criterion-card:hover {
+  border-color: var(--line-strong);
+}
+.criterion-card.na {
+  opacity: 0.30;
+  pointer-events: none;
+}
+.crit-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.crit-id-badge {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding-top: 1px;
+}
+.crit-id-num {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--fg-muted);
+}
+.crit-tag-pill {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.crit-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fg);
+  line-height: 1.5;
+  flex: 1;
+}
+.na-badge {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+}
+
+/* ---- HINT EXPAND ---- */
+.hint-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--fg-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+  margin-bottom: 6px;
+  transition: color 0.12s;
+  letter-spacing: 0.2px;
+}
+.hint-toggle:hover { color: var(--fg-2); }
+.hint-toggle .ht-chevron {
+  font-size: 10px;
+  transition: transform 0.18s;
+  display: inline-block;
+}
+.hint-toggle.open .ht-chevron { transform: rotate(90deg); }
+.hint-body {
+  font-size: 12px;
+  color: var(--fg-2);
+  line-height: 1.65;
+  padding: 10px 14px;
+  background: var(--bg-input);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+  margin-bottom: 10px;
+  display: none;
+}
+.hint-body.open { display: block; }
+.crit-ev {
+  font-size: 11px;
+  color: var(--fg-muted);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.crit-ev::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* ---- INPUTS: YES/NO/NA PILLS ---- */
+.yn-tri {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.yn-pill {
+  padding: 6px 18px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fg-muted);
+  background: var(--bg-input);
+  transition: all 0.12s;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.yn-pill input { display: none; }
+.yn-pill:hover { border-color: var(--line-strong); color: var(--fg-2); background: var(--bg-card-2); }
+.yn-pill.sel-yes { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+.yn-pill.sel-no  { border-color: var(--red); background: rgba(239,68,68,0.08); color: var(--red); }
+.yn-pill.sel-na  { border-color: var(--line-strong); background: var(--bg-card-2); color: var(--fg-2); }
+
+/* ---- INPUTS: M ANCHORS (1-5) ---- */
+.m-inv-note {
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.m-anchors {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.m-anchor {
+  border: 1px solid var(--line);
+  padding: 12px 8px;
+  border-radius: var(--r-sm);
+  font-size: 11px;
+  cursor: pointer;
+  background: var(--bg-input);
+  color: var(--fg-2);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.12s;
+}
+.m-anchor:hover {
+  border-color: var(--accent-border);
+  background: var(--bg-card-2);
+  color: var(--fg);
+}
+.m-anchor.selected {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--fg);
+  box-shadow: 0 0 0 1px var(--accent-border) inset, 0 0 24px rgba(3,175,151,0.08);
+}
+.m-anchor .lvl {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--fg-muted);
+}
+.m-anchor.selected .lvl { color: var(--accent); }
+.m-anchor .anc-text { line-height: 1.4; font-size: 11px; }
+
+/* ---- TRI (BA sponsorable) ---- */
+.tri { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.tri-pill {
+  border: 1px solid var(--line-strong);
+  padding: 6px 16px;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--fg-muted);
+  background: var(--bg-input);
+  transition: all 0.12s;
+  display: inline-flex;
+  align-items: center;
+}
+.tri-pill input { display: none; }
+.tri-pill:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+/* ---- CHECKBOXES ---- */
+.checklist-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.check-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--fg-muted);
+  background: var(--bg-input);
+  transition: all 0.12s;
+  user-select: none;
+}
+.check-pill input { display: none; }
+.check-pill.checked {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+.check-pill .chk-icon {
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid currentColor;
+  border-radius: 3px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+}
+
+/* ---- EVIDENCE NOTE ---- */
+.crit-note-wrap { margin-top: 8px; }
+.crit-note-btn {
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  padding: 3px 12px;
+  font-size: 11px;
+  color: var(--fg-muted);
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 0.3px;
+  transition: all 0.12s;
+}
+.crit-note-btn:hover { border-color: var(--accent-border); color: var(--accent); }
+.crit-note-area { margin-top: 8px; }
+.crit-note-ta {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  background: var(--bg-input);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 12px;
+  padding: 8px 12px;
+  resize: vertical;
+  min-height: 48px;
+  transition: border-color 0.12s;
+}
+.crit-note-ta:focus { border-color: var(--accent-border); outline: none; box-shadow: 0 0 0 3px var(--accent-dim); }
+.crit-note-ta::placeholder { color: var(--fg-muted); }
+
+/* ---- CONFIRM ROW ---- */
+.confirm-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.live-score { font-size: 28px; font-weight: 700; letter-spacing: -1px; color: var(--fg); font-variant-numeric: tabular-nums; }
+.live-score-of { color: var(--fg-muted); font-size: 13px; font-weight: 400; letter-spacing: 0.5px; margin-left: 6px; }
+button.confirm {
+  background: var(--accent);
+  color: var(--bg);
+  border: 0;
+  padding: 11px 28px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  border-radius: var(--r-sm);
+  transition: opacity 0.15s, box-shadow 0.15s;
+}
+button.confirm:hover { opacity: 0.88; box-shadow: 0 0 20px var(--accent-glow); }
+button.ghost {
+  background: transparent;
+  color: var(--fg-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  padding: 9px 18px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+button.ghost:hover { border-color: var(--accent-border); color: var(--accent); }
+
+/* ---- RADAR RAIL ---- */
+.radar-card h4 {
+  font-size: 9px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.rail-score-center { display: flex; justify-content: center; margin-bottom: 8px; }
+.rail-band-center { display: flex; justify-content: center; margin-bottom: 20px; }
+.band-pill {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: var(--r-pill);
+  border: 1px solid currentColor;
+}
+.band-pill.band-invisible  { color: var(--red); border-color: rgba(239,68,68,0.35); }
+.band-pill.band-emerging   { color: var(--amber); border-color: rgba(245,158,11,0.35); }
+.band-pill.band-developing { color: #60A5FA; border-color: rgba(96,165,250,0.35); }
+.band-pill.band-established{ color: var(--green); border-color: rgba(34,197,94,0.35); }
+.band-pill.band-leading    { color: var(--accent); border-color: var(--accent-border); }
+
+.dim-list { list-style: none; padding: 0; margin: 0; font-size: 12px; }
+.dim-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line);
+  gap: 8px;
+}
+.dim-list li:last-child { border-bottom: none; }
+.dim-list-label { color: var(--fg-muted); font-size: 11px; letter-spacing: 0.5px; }
+.dim-list-val {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 13px;
+}
+.val-confirmed { color: var(--accent); }
+.val-unconfirmed { color: var(--fg-muted); }
+.radar-center { display: flex; justify-content: center; margin-bottom: 20px; }
+
+/* ---- SC INPUTS ---- */
+.sc-inputs {
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--accent);
+  padding: 20px;
+  margin-bottom: 24px;
+  background: var(--bg-card);
+  border-radius: 0 var(--r) var(--r) 0;
+}
+.sc-inputs h3 {
+  margin: 0 0 4px 0;
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--fg-2);
+  font-weight: 600;
+}
+.sc-inputs .note {
+  color: var(--fg-muted);
+  font-size: 12px;
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+.sc-input-style {
+  padding: 8px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  font-family: inherit;
+  font-size: 13px;
+  background: var(--bg-input);
+  color: var(--fg);
+  transition: border-color 0.12s;
+}
+.sc-input-style:focus { border-color: var(--accent-border); outline: none; box-shadow: 0 0 0 3px var(--accent-dim); }
+.sc-input-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--fg-muted);
+  letter-spacing: 0.5px;
+}
+
+/* ---- PLATFORM ROW ---- */
+.platform-row {
+  display: grid;
+  grid-template-columns: 100px repeat(6, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 5px 0;
+  font-size: 12px;
+}
+.platform-row.header {
+  color: var(--fg-muted);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.platform-row input {
+  padding: 5px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  font-family: inherit;
+  font-size: 12px;
+  background: var(--bg-input);
+  color: var(--fg);
+  width: 100%;
+}
+
+/* ---- ER READOUT ---- */
+.er-readout {
+  margin-top: 16px;
+  padding: 14px 18px;
+  background: var(--bg-input);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  display: flex;
+  gap: 28px;
+  font-variant-numeric: tabular-nums;
+}
+.er-readout .label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 4px;
+}
+.er-readout .val {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: -0.5px;
+}
+
+/* ---- META GRID ---- */
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px 18px;
+  margin: 10px 0 0 0;
+}
+.meta-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--fg-muted);
+  letter-spacing: 0.5px;
+}
+.meta-grid input, .meta-grid select {
+  padding: 9px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--fg);
+  background: var(--bg-input);
+  transition: border-color 0.12s;
+}
+.meta-grid input:focus, .meta-grid select:focus {
+  border-color: var(--accent-border);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+/* ---- FLAGS GRID ---- */
+.flags-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 20px;
+}
+.flags-grid label {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 10px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  transition: border-color 0.12s;
+}
+.flags-grid label:hover { border-color: var(--accent-border); }
+.flags-grid .flag-def { color: var(--fg-muted); font-size: 11px; margin-top: 2px; line-height: 1.5; }
+.flag-error { color: var(--red); font-size: 12px; margin-top: 8px; }
+
+/* ---- SUMMARY ---- */
+.summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.summary-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.import-note { font-size: 11px; color: var(--fg-muted); margin-top: 4px; }
+
+/* Summary two-col layout */
+.summary-score-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+  margin-bottom: 28px;
+}
+.summary-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 28px;
+}
+.score-ring-center { display: flex; justify-content: center; margin: 16px 0 12px; }
+.score-band-center { display: flex; justify-content: center; margin-bottom: 24px; }
+.dim-score-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+.dim-score-card {
+  background: var(--bg-card-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 12px 14px;
+  transition: border-color 0.12s;
+}
+.dim-score-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.dim-score-name { font-size: 11px; font-weight: 600; letter-spacing: 0.5px; color: var(--fg-2); }
+.dim-score-badge {
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.3px;
+}
+.dim-score-bar-bg {
+  height: 3px;
+  background: var(--line-strong);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.dim-score-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.16,1,0.3,1);
+}
+
+/* Sub-component bar chart */
+.subcomp-chart-section {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.chart-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.chart-dim-group { margin-bottom: 20px; }
+.chart-dim-group:last-child { margin-bottom: 0; }
+.chart-dim-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.bar-row {
+  display: grid;
+  grid-template-columns: 180px 1fr 52px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.bar-row:last-child { margin-bottom: 0; }
+.bar-label { font-size: 11px; color: var(--fg-2); text-align: right; }
+.bar-track {
+  height: 6px;
+  background: var(--line-strong);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.7s cubic-bezier(0.16,1,0.3,1);
+}
+.bar-score {
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* ---- FLAG ALERTS ---- */
+.flags-section {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.flags-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.flag-alert {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border-radius: var(--r-sm);
+  margin-bottom: 8px;
+  border: 1px solid;
+}
+.flag-alert:last-child { margin-bottom: 0; }
+.flag-alert.critical {
+  background: rgba(239,68,68,0.07);
+  border-color: rgba(239,68,68,0.22);
+}
+.flag-alert .flag-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+}
+.flag-alert .flag-text { font-size: 13px; color: var(--fg-2); line-height: 1.55; }
+.flag-alert .flag-prov {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-top: 4px;
+}
+.flag-alert-icon-critical { color: var(--red); }
+.empty-flags { font-size: 13px; color: var(--fg-muted); display: flex; align-items: center; gap: 8px; }
+
+/* ---- FOCUS AREAS ---- */
+.focus-section {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.focus-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.focus-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--r-sm);
+}
+.focus-dim { flex: 1; font-size: 13px; color: var(--fg-2); }
+.focus-score { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--accent); }
+.focus-max { font-weight: 400; color: var(--fg-muted); font-size: 12px; }
+.focus-note { font-size: 11px; color: var(--fg-muted); white-space: nowrap; }
+
+/* ---- AV DEFS ---- */
+.av-defs {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 14px;
+  font-size: 12px;
+  margin: 8px 0 14px 0;
+}
+.av-defs dt { font-weight: 600; color: var(--fg-2); white-space: nowrap; padding-top: 1px; }
+.av-defs dd { margin: 0; color: var(--fg-muted); }
+
+/* ---- DRAFT TOAST ---- */
+.draft-toast {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 200;
+  background: var(--bg-card-2);
+  color: var(--fg);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.6), 0 0 0 1px var(--line);
+  animation: toast-in 0.2s ease;
+}
+@keyframes toast-in { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+.draft-toast .dt-save {
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  padding: 7px 14px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  border-radius: var(--r-sm);
+  white-space: nowrap;
+}
+.draft-toast .dt-close {
+  background: none;
+  border: none;
+  color: var(--fg-muted);
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  padding: 0 4px;
+  font-family: inherit;
+}
+
+/* ---- SECTION DIVIDER ---- */
+.section-divider {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin: 28px 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-divider::before {
+  content: '';
+  width: 3px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ---- FOOTER ---- */
+.footer-note {
+  padding: 20px 40px;
+  color: var(--fg-muted);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  border-top: 1px solid var(--line);
+  text-align: center;
+  background: var(--bg-card);
+  text-transform: uppercase;
+}
+
+#importFile { display: none; }
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 960px) {
+  main { grid-template-columns: 1fr; }
+  aside.radar-rail { align-self: auto; border-left: none; border-top: 1px solid var(--line); }
+  .summary-score-grid { grid-template-columns: 1fr; }
+  .meta-grid { grid-template-columns: 1fr 1fr; }
+  .platform-row { grid-template-columns: 1fr; }
+  .m-anchors { grid-template-columns: 1fr; }
+  .bar-row { grid-template-columns: 140px 1fr 44px; }
+}
+@media (max-width: 768px) {
+  nav.tabs { padding: 0 12px; }
+  nav.tabs button { padding: 0 12px; font-size: 10px; }
+  section.panel { padding: 20px 16px 80px; }
+  header { padding: 0 16px; }
+  .flags-grid { grid-template-columns: 1fr; }
+  .bar-row { grid-template-columns: 110px 1fr 40px; }
+}
+
+/* ---- PRINT ---- */
+@media print {
+  header, nav.tabs, .dim-sticky, .confirm-row, .draft-toast, .summary-actions,
+  .import-note, .type-legend, .av-defs, .hint-toggle { display: none !important; }
+  body { background: #fff !important; color: #111 !important; }
+  .summary-card, .subcomp-chart-section, .flags-section, .focus-section {
+    background: #f9f9f9 !important; border-color: #ddd !important;
   }
-  * { box-sizing: border-box; }
-  html, body {
-    margin: 0; padding: 0; background: var(--bg); color: var(--fg);
-    font-family: 'Roboto', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
-    font-size: 15px; line-height: 1.55;
-  }
-  /* HEADER */
-  header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 40px; border-bottom: 1px solid var(--line);
-    background: var(--bg-1);
-  }
-  header h1 { margin: 0; font-weight: 700; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; }
-  header .sub { color: var(--muted); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
-  header .status { font-size: 11px; letter-spacing: 1px; color: var(--muted); }
-  /* TABS */
-  nav.tabs {
-    display: flex; gap: 0; padding: 0 32px;
-    border-bottom: 1px solid var(--line);
-    background: var(--bg-1); position: sticky; top: 0; z-index: 10;
-  }
-  nav.tabs button {
-    background: transparent; border: 0; border-bottom: 2px solid transparent;
-    padding: 12px 16px; font-size: 10px; color: var(--muted);
-    letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
-    font-family: inherit; transition: color 0.15s;
-  }
-  nav.tabs button:hover { color: var(--fg-2); }
-  nav.tabs button.active { color: var(--accent); border-bottom-color: var(--accent); }
-  nav.tabs button[data-dim].active { color: var(--accent); border-bottom-color: var(--accent); }
-  nav.tabs button .tab-count { display: block; font-size: 9px; letter-spacing: 0.5px; margin-top: 2px; text-transform: none; opacity: 0.6; }
-  /* MAIN LAYOUT - right panel fills full column height */
-  main {
-    display: grid; grid-template-columns: 1fr 300px;
-    min-height: calc(100vh - 50px); gap: 0;
-  }
-  main.summary-view { grid-template-columns: 1fr; }
-  section.panel { min-width: 0; padding: 28px 36px 80px 36px; }
-  aside.radar-rail {
-    background: var(--bg-1); align-self: stretch;
-    border-left: 1px solid var(--line);
-  }
-  .radar-card {
-    position: sticky; top: 50px; padding: 22px;
-    background: transparent; border: none;
-  }
-  /* TYPOGRAPHY */
-  h2 { font-weight: 600; font-size: 15px; margin: 0 0 4px 0; letter-spacing: 2px; text-transform: uppercase; }
-  h2 .dim-code { color: var(--accent); font-weight: 700; margin-right: 10px; }
-  .dim-intro { color: var(--muted); font-size: 12px; margin-bottom: 14px; }
-  /* TYPE LEGEND */
-  .type-legend {
-    display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 11px; color: var(--fg-2);
-    margin-bottom: 22px; padding: 10px 14px;
-    background: var(--bg-2); border-radius: var(--r); border: 1px solid var(--line);
-  }
-  .type-legend .leg-item b { color: var(--fg); }
-  /* SUBCOMPONENT */
-  .subcomp { border-top: 1px solid var(--line); padding: 0 0 8px 0; }
-  .subcomp h3 { margin: 0; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--fg-2); }
-  .subcomp .sc-meta { color: var(--muted); font-size: 12px; margin-bottom: 14px; margin-top: 5px; }
-  .subcomp-header { display: flex; align-items: center; gap: 10px; padding: 16px 0 0 0; cursor: pointer; user-select: none; }
-  .subcomp-header h3 { flex: 1; }
-  .subcomp-toggle { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 13px; padding: 0 2px; transition: transform 0.18s; font-family: inherit; line-height: 1; }
-  .subcomp.collapsed .subcomp-toggle { transform: rotate(-90deg); }
-  .subcomp.collapsed .sc-meta, .subcomp.collapsed .criterion { display: none; }
-  .sc-badge { font-size: 10px; color: var(--muted); background: var(--bg-2); padding: 2px 9px; border-radius: var(--r-pill); white-space: nowrap; border: 1px solid var(--line); }
-  .sc-badge.done { background: rgba(82,193,120,0.10); color: var(--ok); font-weight: 600; border-color: rgba(82,193,120,0.22); }
-  /* CRITERION ROWS */
-  .criterion {
-    display: grid; grid-template-columns: 52px 1fr; gap: 14px;
-    padding: 14px 0; border-bottom: 1px solid var(--line);
-  }
-  .criterion:last-child { border-bottom: 0; }
-  .criterion.na { opacity: 0.32; }
-  .na-badge {
-    display: inline-block; margin-top: 4px; padding: 1px 9px;
-    border: 1px solid var(--line-strong); border-radius: var(--r-pill);
-    font-size: 10px; letter-spacing: 1px; color: var(--muted);
-  }
-  .crit-id { font-size: 11px; letter-spacing: 1px; color: var(--muted); padding-top: 2px; }
-  .crit-id .pat { color: var(--accent); font-weight: 600; }
-  .crit-text { font-size: 14px; color: var(--fg); }
-  .crit-hint { font-size: 12px; color: var(--fg-2); margin-top: 5px; line-height: 1.5; }
-  .crit-ev { font-size: 11px; color: var(--muted); margin-top: 4px; }
-  .crit-note-wrap { margin-top: 8px; }
-  .crit-note-btn { background: none; border: 1px solid var(--line); border-radius: var(--r-pill); padding: 3px 12px; font-size: 11px; color: var(--fg-2); cursor: pointer; font-family: inherit; letter-spacing: 0.3px; }
-  .crit-note-btn:hover { border-color: var(--accent-border); color: var(--accent); }
-  .crit-note-area { margin-top: 8px; }
-  .crit-note-ta { width: 100%; max-width: 100%; box-sizing: border-box; background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r-sm); color: var(--fg); font-family: inherit; font-size: 12px; padding: 8px; resize: vertical; min-height: 44px; }
-  .crit-note-ta:focus { border-color: var(--accent-border); outline: none; }
-  .crit-note-ta::placeholder { color: var(--muted); }
-  .crit-input { margin-top: 10px; }
-  .crit-input label { display: inline-flex; align-items: center; gap: 6px; margin-right: 18px; cursor: pointer; font-size: 13px; }
-  .crit-input input { accent-color: var(--accent); }
-  /* M ANCHORS */
-  .m-anchors { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 10px; }
-  .m-anchor {
-    border: 1px solid var(--line); padding: 10px; border-radius: var(--r-sm); font-size: 11px;
-    cursor: pointer; background: var(--bg-2); color: var(--fg-2);
-    display: flex; flex-direction: column; gap: 5px; align-items: flex-start;
-    transition: border-color 0.12s, box-shadow 0.12s, background 0.12s;
-  }
-  .m-anchor:hover { border-color: var(--line-strong); background: var(--bg-1); }
-  .m-anchor.selected {
-    border-color: var(--accent); background: var(--accent-dim);
-    box-shadow: 0 0 0 1px var(--accent-border), 0 0 20px rgba(226,143,38,0.07);
-    color: var(--fg);
-  }
-  .m-anchor .lvl { font-size: 10px; letter-spacing: 1px; color: var(--muted); }
-  .m-anchor.selected .lvl { color: var(--accent); }
-  .m-anchor .anc-text { line-height: 1.35; }
-  .inv-note { font-size: 11px; color: var(--accent); letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 500; }
-  /* TRI (BA sponsorable) */
-  .tri { display: flex; gap: 8px; flex-wrap: wrap; }
-  .tri label {
-    border: 1px solid var(--line); padding: 6px 16px;
-    border-radius: var(--r-pill); cursor: pointer; font-size: 12px; color: var(--muted);
-    transition: border-color 0.1s, background 0.1s, color 0.1s;
-  }
-  .tri input[type=radio] { display: none; }
-  .tri label:has(input:checked) { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
-  /* YES / NO / N/A */
-  .yn-tri { display: flex; gap: 8px; flex-wrap: wrap; }
-  .yn-tri label {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 5px 18px; border: 1px solid var(--line);
-    border-radius: var(--r-pill); cursor: pointer; font-size: 12px; font-weight: 500;
-    color: var(--muted); transition: border-color 0.1s, background 0.1s, color 0.1s;
-    user-select: none;
-  }
-  .yn-tri input[type=radio] { display: none; }
-  .yn-tri label.yn-sel-yes { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
-  .yn-tri label.yn-sel-no  { border-color: var(--gap); background: rgba(217,96,58,0.10); color: var(--gap); }
-  .yn-tri label.yn-sel-na  { border-color: var(--line-strong); background: var(--bg-2); color: var(--fg-2); }
-  /* CONFIRM ROW */
-  .confirm-row {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line);
-  }
-  .confirm-row .live-score { font-size: 24px; font-weight: 600; letter-spacing: -0.5px; }
-  .confirm-row .live-score span { color: var(--muted); font-size: 12px; font-weight: 400; letter-spacing: 1px; margin-left: 8px; }
-  button.confirm {
-    background: var(--accent); color: #060a0d; border: 0;
-    padding: 11px 28px; letter-spacing: 2px; text-transform: uppercase; font-size: 11px;
-    cursor: pointer; font-family: inherit; border-radius: var(--r-sm); font-weight: 700;
-    transition: opacity 0.15s;
-  }
-  button.confirm:hover { opacity: 0.82; }
-  button.ghost {
-    background: transparent; color: var(--fg-2);
-    border: 1px solid var(--line-strong); border-radius: var(--r-sm);
-    padding: 10px 18px; letter-spacing: 1.5px; text-transform: uppercase; font-size: 11px;
-    cursor: pointer; font-family: inherit;
-    transition: border-color 0.15s, color 0.15s;
-  }
-  button.ghost:hover { border-color: var(--accent); color: var(--accent); }
-  /* RADAR CARD (inside aside) */
-  .radar-card h4 {
-    margin: 0 0 8px 0; font-size: 10px; letter-spacing: 2px;
-    text-transform: uppercase; color: var(--muted); font-weight: 500;
-  }
-  .composite { font-size: 40px; font-weight: 600; letter-spacing: -1px; color: var(--fg); }
-  .composite .of { color: var(--muted); font-size: 18px; font-weight: 400; }
-  .band {
-    display: inline-block; font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase;
-    color: var(--accent); margin-top: 6px; padding: 4px 14px;
-    border: 1px solid var(--accent-border); border-radius: var(--r-pill);
-  }
-  .dim-list { list-style: none; padding: 0; margin: 18px 0 0 0; font-size: 12px; }
-  .dim-list li {
-    display: flex; justify-content: space-between; padding: 7px 0;
-    border-bottom: 1px solid var(--line);
-  }
-  .dim-list li.confirmed { color: var(--fg-2); }
-  .dim-list li:not(.confirmed) { color: var(--muted); }
-  .dim-list li .val { font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 600; }
-  /* RED FLAGS */
-  .flags { margin-top: 18px; }
-  .flags h4 { margin: 0 0 8px 0; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); font-weight: 500; }
-  .flag-chip {
-    display: block; padding: 10px 14px; margin-bottom: 6px; font-size: 12px; color: var(--fg-2);
-    border-left: 2px solid var(--gap); background: rgba(217,96,58,0.07);
-    border-radius: 0 var(--r-sm) var(--r-sm) 0;
-  }
-  .flag-chip.provisional::after {
-    content: 'early result, verify after 5+ assessments'; display: block; margin-top: 4px;
-    font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted);
-  }
-  .empty-flags { font-size: 12px; color: var(--muted); font-style: italic; }
-  /* FOCUS AREAS */
-  .focus-box { margin-top: 18px; }
-  .focus-box h4 { margin: 0 0 8px 0; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); font-weight: 500; }
-  .focus-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
-  .focus-list li {
-    display: flex; align-items: baseline; gap: 10px;
-    padding: 8px 12px; border-left: 2px solid var(--accent);
-    background: var(--accent-dim); border-radius: 0 var(--r-sm) var(--r-sm) 0; font-size: 12px;
-  }
-  .focus-dim { flex: 1; }
-  .focus-score { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--accent); }
-  .focus-max { font-weight: 400; color: var(--muted); font-size: 11px; }
-  .focus-note { font-size: 11px; color: var(--muted); white-space: nowrap; }
-  /* META GRID (summary tab brand fields) */
-  .meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 20px; margin: 8px 0 24px 0; }
-  .meta-grid label { display: flex; flex-direction: column; font-size: 11px; color: var(--muted); letter-spacing: 0.5px; }
-  .meta-grid input, .meta-grid select {
-    margin-top: 6px; padding: 10px 12px;
-    border: 1px solid var(--line-strong); border-radius: var(--r-sm);
-    font-family: inherit; font-size: 14px; color: var(--fg); background: var(--bg-2);
-  }
-  /* SECTION CARDS (sc-inputs) */
-  .sc-inputs {
-    border: 1px solid var(--line); border-left: 2px solid var(--accent);
-    padding: 18px; margin-bottom: 22px;
-    background: var(--bg-1); border-radius: 0 var(--r) var(--r) 0;
-  }
-  .sc-inputs h3 { margin: 0 0 4px 0; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--fg-2); }
-  .sc-inputs .note { color: var(--muted); font-size: 12px; margin-bottom: 14px; }
-  /* SECTOR FLAGS GRID */
-  .flags-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 22px; }
-  .flags-grid label { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; cursor: pointer; }
-  .flags-grid .flag-def { color: var(--fg-2); font-size: 12px; margin-top: 2px; }
-  .flag-error { color: var(--gap); font-size: 12px; margin-top: 8px; }
-  /* SC SOCIAL INPUTS */
-  .platform-row {
-    display: grid; grid-template-columns: 130px repeat(6, 1fr); gap: 10px; align-items: center;
-    padding: 6px 0; font-size: 12px;
-  }
-  .platform-row.header { color: var(--muted); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
-  .platform-row input {
-    padding: 6px 8px; border: 1px solid var(--line-strong); border-radius: var(--r-sm);
-    font-family: inherit; font-size: 13px; background: var(--bg-2); color: var(--fg); width: 100%;
-  }
-  .er-readout {
-    margin-top: 14px; padding: 12px 16px;
-    background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r);
-    display: flex; gap: 30px; font-variant-numeric: tabular-nums;
-  }
-  .er-readout .label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
-  .er-readout .val { font-size: 18px; font-weight: 500; color: var(--accent); }
-  /* SUMMARY HEADER */
-  .summary-header { display: flex; justify-content: space-between; align-items: end; margin-bottom: 24px; flex-wrap: wrap; gap: 8px; }
-  .summary-header .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-  .import-note { font-size: 11px; color: var(--muted); margin-top: 4px; text-align: right; width: 100%; }
-  /* AV PROTOCOL DEFS */
-  .av-defs { margin: 8px 0 14px 0; padding: 0; display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; font-size: 12px; }
-  .av-defs dt { font-weight: 600; color: var(--fg-2); white-space: nowrap; padding-top: 1px; }
-  .av-defs dd { margin: 0; color: var(--muted); }
-  /* BIG RADAR (summary page) */
-  .big-radar { display: flex; justify-content: center; margin: 20px 0 40px 0; }
-  .summary-score-card {
-    background: var(--bg-1); border: 1px solid var(--line); border-radius: var(--r);
-    padding: 28px; margin-bottom: 24px;
-  }
-  .summary-score-card .dim-list li .val { color: var(--accent); font-weight: 600; }
-  /* MATURITY BANDS */
-  .band-invisible  { color: var(--accent); }
-  .band-emerging   { color: var(--accent); }
-  .band-developing { color: var(--accent); }
-  .band-established{ color: #52c178; }
-  .band-leading    { color: #2ecc71; }
-  /* FOOTER */
-  .footer-note {
-    padding: 20px 40px; color: var(--muted); font-size: 10px; letter-spacing: 1px;
-    border-top: 1px solid var(--line); text-align: center; background: var(--bg-1);
-    text-transform: uppercase;
-  }
-  #importFile { display: none; }
-  /* STICKY PROGRESS BAR */
-  .dim-sticky { position: sticky; top: 50px; z-index: 4; background: var(--bg); border-bottom: 1px solid var(--line); padding: 8px 0 10px 0; margin-bottom: 22px; }
-  .dim-sticky-inner { display: flex; align-items: center; gap: 14px; }
-  .dim-sticky-inner .dl { font-size: 10px; color: var(--muted); white-space: nowrap; text-transform: uppercase; letter-spacing: 1px; }
-  .dim-sticky-inner .dbar { flex: 1; height: 3px; background: var(--bg-2); border-radius: 2px; overflow: hidden; }
-  .dim-sticky-inner .dbar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s ease; box-shadow: 0 0 10px rgba(226,143,38,0.6); }
-  .dim-sticky-inner .dc { font-size: 12px; font-weight: 500; white-space: nowrap; color: var(--fg-2); }
-  .dim-sticky-inner .dt { font-size: 11px; color: var(--muted); padding-left: 10px; border-left: 1px solid var(--line); white-space: nowrap; }
-  /* DRAFT TOAST */
-  .draft-toast {
-    position: fixed; bottom: 28px; right: 28px; z-index: 200;
-    background: var(--bg-2); color: var(--fg);
-    border: 1px solid var(--line-strong); border-radius: var(--r);
-    padding: 14px 20px; display: flex; align-items: center; gap: 16px; font-size: 13px;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.7); animation: toast-in 0.2s ease;
-  }
-  @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-  .draft-toast .dt-save { background: var(--accent); color: #060a0d; border: none; padding: 7px 14px; cursor: pointer; font-family: inherit; font-size: 12px; letter-spacing: 0.5px; border-radius: var(--r-sm); font-weight: 700; }
-  .draft-toast .dt-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 20px; line-height: 1; padding: 0 4px; font-family: inherit; }
-  /* RESPONSIVE */
-  @media (max-width: 900px) {
-    main { grid-template-columns: 1fr; }
-    aside.radar-rail { align-self: auto; border-left: none; border-top: 1px solid var(--line); }
-    .meta-grid { grid-template-columns: 1fr 1fr; }
-    .platform-row { grid-template-columns: 1fr; }
-    .m-anchors { grid-template-columns: 1fr; }
-  }
-  @media (max-width: 768px) {
-    nav.tabs { padding: 0 12px; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
-    nav.tabs button { padding: 12px 10px; font-size: 10px; white-space: nowrap; }
-    section.panel { padding: 20px 16px 60px 16px; }
-    header { padding: 12px 16px; }
-    .summary-header { flex-direction: column; align-items: flex-start; }
-    .summary-header .actions { width: 100%; }
-    .flags-grid { grid-template-columns: 1fr; }
-  }
-  /* PRINT */
-  @media print {
-    header, nav.tabs, .dim-sticky, .confirm-row, .draft-toast, .actions, .import-note, .focus-box, .type-legend, .av-defs { display: none !important; }
-    body { background: #fff !important; color: #111 !important; }
-    aside.radar-rail { background: #fff !important; border: none !important; }
-    .radar-card { background: #fff !important; border: 1px solid #ddd !important; page-break-inside: avoid; }
-    .radar-card h4, .dim-list li { color: #333 !important; }
-    .band { border-color: #e28f26 !important; color: #e28f26 !important; }
-    .dim-list li .val { color: #e28f26 !important; }
-    main { display: block !important; background: #fff !important; }
-    section.panel { padding: 0 16px !important; border: none !important; }
-    .subcomp { page-break-inside: avoid; }
-    .crit-text { color: #111 !important; }
-    .crit-hint { color: #555 !important; }
-    .crit-id { color: #888 !important; }
-    .yn-tri label { padding: 3px 10px; font-size: 11px; border-color: #ddd; color: #999; background: #fff; border-radius: 12px; }
-    .yn-tri label.yn-sel-yes { border-color: #e28f26; color: #e28f26; background: #fff8ec; }
-    .yn-tri label.yn-sel-no  { border-color: #d9603a; color: #d9603a; background: #fdf0eb; }
-    .yn-tri label.yn-sel-na  { border-color: #aaa; color: #777; background: #f5f5f5; }
-    .m-anchor { border-color: #ddd !important; background: #f9f9f9 !important; box-shadow: none !important; color: #333 !important; }
-    .m-anchor.selected { border-color: #e28f26 !important; background: #fff8ec !important; }
-    .sc-inputs { background: #f9f9f9 !important; border-color: #e28f26 !important; border-radius: 0 !important; }
-    .sc-inputs h3 { color: #555 !important; }
-    .focus-list li { background: #fff8ec !important; }
-    .flag-chip { background: #fdf0eb !important; }
-  }
+  main { display: block !important; }
+  section.panel { padding: 0 16px !important; }
+}
+
 </style>
 
 <header>
-  <div>
-    <h1><span style="color:var(--accent)">VISTA</span> Calculator</h1>
-    <div class="sub">Visibility Intelligence &amp; Strategic Trust Assessment · v1</div>
+  <div class="header-brand">
+    <div class="header-logo"><em>VISTA</em> Calculator</div>
+    <div class="header-sub">Visibility Intelligence &amp; Strategic Trust Assessment &middot; v1</div>
   </div>
-  <div class="sub" id="assert-status">loading…</div>
+  <div class="header-status" id="assert-status">loading&hellip;</div>
 </header>
 
 <nav class="tabs" id="tabs"></nav>
@@ -374,7 +1191,7 @@
 </main>
 
 <div class="footer-note">
-  Works offline · no internet needed · 195 criteria · your answers never leave this file
+  Works offline &middot; no internet needed &middot; 195 criteria &middot; your answers never leave this file
 </div>
 
 <input type="file" id="importFile" accept="application/json">
@@ -1017,6 +1834,11 @@ function progressFor(dim) {
   return { answered, applicable };
 }
 
+
+
+/* ============================================================
+   RENDER -- tabs
+   ============================================================ */
 function renderTabs() {
   const nav = document.getElementById("tabs");
   nav.innerHTML = "";
@@ -1024,7 +1846,8 @@ function renderTabs() {
   for (const t of tabs) {
     const b = document.createElement("button");
     const p = t.key === "SUMMARY" ? progressFor(null) : progressFor(t.key);
-    b.innerHTML = `${t.label}<span class="tab-count">${p.answered}/${p.applicable}</span>`;
+    const pct = p.applicable > 0 ? Math.round(p.answered / p.applicable * 100) : 0;
+    b.innerHTML = `${t.label}<span class="tab-count">${pct}%</span>`;
     b.className = (state.activeTab === t.key) ? "active" : "";
     if (t.key !== "SUMMARY") b.setAttribute("data-dim", t.key);
     b.onclick = () => {
@@ -1037,10 +1860,7 @@ function renderTabs() {
 }
 
 function anchorFor(c, lvl) {
-  // Criterion-specific anchors take priority - required for all -inv criteria.
   if (c.inlineAnchors && c.inlineAnchors[lvl]) return c.inlineAnchors[lvl];
-  // Formal -inv rule: reverse the base pattern's level order.
-  // 5 always = good/desirable, 1 always = deficient (zero-anchored).
   const p = PATTERNS[c.pattern];
   if (!p) return "";
   if (c.inverted) return p.levels[6 - lvl];
@@ -1066,7 +1886,6 @@ function scrollToNextUnanswered() {
   const el = document.querySelector(`[data-crit-id="${next.id}"]`);
   if (!el) return;
   const rect = el.getBoundingClientRect();
-  // Forward-only: only scroll if the next unanswered is below the current view
   if (rect.top > window.innerHeight * 0.65) {
     el.scrollIntoView({ behavior: "smooth", block: "center" });
   }
@@ -1078,7 +1897,7 @@ function showDraftToast(answered) {
   const div = document.createElement("div");
   div.id = "draft-toast";
   div.className = "draft-toast";
-  div.innerHTML = `<span>You've answered <strong>${answered}</strong> questions. Save a draft so you don't lose your work.</span>
+  div.innerHTML = `<span>You have answered <strong>${answered}</strong> questions. Save a draft so you don't lose your work.</span>
     <button class="dt-save">Save draft</button>
     <button class="dt-close" title="Dismiss">&#x2715;</button>`;
   div.querySelector(".dt-save").onclick = () => { exportJSON(); div.remove(); };
@@ -1096,6 +1915,9 @@ function checkDraftPrompt() {
   }
 }
 
+/* ============================================================
+   RENDER -- dimension tab
+   ============================================================ */
 function renderDimTab(dim) {
   const meta = DIM_META.find(d => d.key === dim);
   const wrap = document.createElement("div");
@@ -1106,16 +1928,17 @@ function renderDimTab(dim) {
   const sticky = document.createElement("div");
   sticky.className = "dim-sticky";
   sticky.innerHTML = `<div class="dim-sticky-inner">
-    <span class="dl">Your progress</span>
+    <span class="dl">Progress</span>
     <div class="dbar"><div class="dbar-fill" style="width:${pct}%"></div></div>
-    <span class="dc">${dimAnswered} of ${dimApplicable} done</span>
+    <span class="dc">${dimAnswered}/${dimApplicable}</span>
     <span class="dt">~${meta.time} min</span>
   </div>`;
   wrap.appendChild(sticky);
 
-  const h = document.createElement("h2");
-  h.innerHTML = `<span class="dim-code">${dim}</span>${meta.name}`;
-  wrap.appendChild(h);
+  const heading = document.createElement("div"); heading.className = "dim-heading";
+  heading.innerHTML = `<span class="dim-code-badge">${dim}</span><span class="dim-title">${meta.name}</span>`;
+  wrap.appendChild(heading);
+
   const intro = document.createElement("div");
   intro.className = "dim-intro";
   intro.textContent = meta.intro;
@@ -1123,15 +1946,12 @@ function renderDimTab(dim) {
 
   const legend = document.createElement("div");
   legend.className = "type-legend";
-  legend.innerHTML = `<span class="leg-item"><b>[A]</b> Quick check &mdash; use a tool or look it up directly</span><span class="leg-item"><b>[S]</b> Spot-check &mdash; brief research + your judgement</span><span class="leg-item"><b>[M]</b> Rate 1&ndash;5 &mdash; pick the level that best fits</span>`;
+  legend.innerHTML = `<span><b>[A]</b> Quick check: use a tool or look it up directly</span><span><b>[S]</b> Spot-check: brief research plus your judgement</span><span><b>[M]</b> Rate 1 to 5: pick the level that best fits</span>`;
   wrap.appendChild(legend);
 
-  // SC dimension: measurement inputs block above criteria
   if (dim === "SC") wrap.appendChild(renderSCInputs());
-  // AV dimension: clean-session protocol reminder + engine version log
   if (dim === "AV") wrap.appendChild(renderAVProtocol());
 
-  // Group by sub-component
   const bySubComp = {};
   for (const c of CRITERIA) {
     if (c.dimension !== dim) continue;
@@ -1144,11 +1964,10 @@ function renderDimTab(dim) {
     const sec = document.createElement("div");
     sec.className = "subcomp" + (isCollapsed ? " collapsed" : "");
 
-    // Collapsible header
     const { answered: scAns, applicable: scApp } = progressForSubComp(sc);
     const hdr = document.createElement("div"); hdr.className = "subcomp-header";
     const toggle = document.createElement("button"); toggle.className = "subcomp-toggle";
-    toggle.textContent = "▾"; toggle.setAttribute("aria-label", isCollapsed ? "Expand" : "Collapse");
+    toggle.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
     toggle.onclick = (e) => { e.stopPropagation(); state.collapsed[secKey] = !state.collapsed[secKey]; renderAll(); };
     const h3 = document.createElement("h3"); h3.textContent = sc;
     const badge = document.createElement("span");
@@ -1158,30 +1977,30 @@ function renderDimTab(dim) {
     hdr.onclick = () => { state.collapsed[secKey] = !state.collapsed[secKey]; renderAll(); };
     sec.appendChild(hdr);
 
-    const meta2 = document.createElement("div"); meta2.className = "sc-meta";
+    const metaEl = document.createElement("div"); metaEl.className = "sc-meta";
     const applicable = arr.filter(c => isApplicable(c, state.flags));
     if (applicable.length === 0) {
-      meta2.textContent = `${arr[0].subComponentPoints} pts · entire section not applicable under current settings · points redistributed within ${dim}`;
+      metaEl.textContent = `${arr[0].subComponentPoints} pts -- entire section not applicable under current settings -- points redistributed within ${dim}`;
     } else {
       const per = model.ptsOf[applicable[0].id];
       const naNote = applicable.length < arr.length ? `, ${arr.length - applicable.length} not applicable` : "";
-      meta2.textContent = `${arr[0].subComponentPoints} pts · ${applicable.length} questions${naNote} · ${per.toFixed(2)} pts each`;
+      metaEl.textContent = `${arr[0].subComponentPoints} pts / ${applicable.length} questions${naNote} / ${per.toFixed(2)} pts each`;
     }
-    sec.appendChild(meta2);
+    sec.appendChild(metaEl);
     for (const c of arr) sec.appendChild(renderCriterion(c));
     wrap.appendChild(sec);
   }
 
-  // Confirm row with live dimension score
+  // Confirm row
   const row = document.createElement("div");
   row.className = "confirm-row";
-  const live = document.createElement("div");
-  live.className = "live-score";
+  const live = document.createElement("div"); live.className = "live-score";
   const s = dimensionScore(dim, state);
-  live.innerHTML = s === null ? `n/a<span>not applicable</span>` : `${s.toFixed(1)}<span>/ 100</span>`;
+  live.innerHTML = s === null
+    ? `n/a<span class="live-score-of">not applicable</span>`
+    : `${s.toFixed(1)}<span class="live-score-of">/ 100</span>`;
   row.appendChild(live);
-  const btn = document.createElement("button");
-  btn.className = "confirm";
+  const btn = document.createElement("button"); btn.className = "confirm";
   btn.textContent = state.confirmed[dim] ? "Confirm again" : "Confirm section";
   btn.onclick = () => {
     state.confirmed[dim] = true;
@@ -1193,32 +2012,64 @@ function renderDimTab(dim) {
   return wrap;
 }
 
+/* ============================================================
+   RENDER -- criterion card
+   ============================================================ */
 function renderCriterion(c) {
   const el = document.createElement("div");
   const na = !isApplicable(c, state.flags);
-  el.className = "criterion" + (na ? " na" : "");
+  el.className = "criterion-card" + (na ? " na" : "");
   el.dataset.critId = c.id;
-  const idBox = document.createElement("div"); idBox.className = "crit-id";
-  const patLabel = c.tag === "M"
-    ? `<span class="pat">[M-${c.pattern}${c.inverted?"-inv":""}]</span>`
-    : `<span class="pat">[${c.tag}]</span>`;
-  idBox.innerHTML = `${c.id}<br>${patLabel}` + (na ? `<br><span class="na-badge">N/A</span>` : "");
-  el.appendChild(idBox);
-  const body = document.createElement("div"); body.className = "crit-body";
-  const t = document.createElement("div"); t.className = "crit-text"; t.textContent = c.text; body.appendChild(t);
+
+  const header = document.createElement("div"); header.className = "crit-header";
+
+  const idBadge = document.createElement("div"); idBadge.className = "crit-id-badge";
+  const tagLabel = c.tag === "M"
+    ? `[M-${c.pattern}${c.inverted?"-inv":""}]`
+    : `[${c.tag}]`;
+  idBadge.innerHTML = `<div class="crit-id-num">${c.id}</div><div class="crit-tag-pill">${tagLabel}</div>`;
+  if (na) idBadge.innerHTML += `<span class="na-badge">N/A</span>`;
+
+  const textEl = document.createElement("div"); textEl.className = "crit-text";
+  textEl.textContent = c.text;
+
+  header.appendChild(idBadge);
+  header.appendChild(textEl);
+  el.appendChild(header);
+
   if (na) {
-    const n = document.createElement("div"); n.className = "crit-hint";
-    n.textContent = "Not applicable for this brand type. Automatically skipped.";
-    body.appendChild(n);
-    el.appendChild(body);
+    const naHint = document.createElement("div");
+    naHint.style.cssText = "font-size:12px;color:var(--fg-muted);padding:0 0 4px 54px;";
+    naHint.textContent = "Not applicable for this brand type. Automatically skipped.";
+    el.appendChild(naHint);
     return el;
   }
+
+  const body = document.createElement("div");
+  body.style.paddingLeft = "54px";
+
   if (c.hint) {
-    const h = document.createElement("div"); h.className = "crit-hint"; h.textContent = c.hint; body.appendChild(h);
+    const hintToggle = document.createElement("button"); hintToggle.className = "hint-toggle";
+    hintToggle.innerHTML = `<span class="ht-chevron">&#9654;</span> How to score this`;
+    const hintBody = document.createElement("div"); hintBody.className = "hint-body";
+    hintBody.textContent = c.hint;
+    hintToggle.onclick = () => {
+      const open = hintBody.classList.toggle("open");
+      hintToggle.classList.toggle("open", open);
+    };
+    body.appendChild(hintToggle);
+    body.appendChild(hintBody);
   }
-  const ev = document.createElement("div"); ev.className = "crit-ev"; ev.textContent = "Record: " + c.evidence; body.appendChild(ev);
+
+  if (c.evidence) {
+    const ev = document.createElement("div"); ev.className = "crit-ev";
+    ev.textContent = "Record: " + c.evidence;
+    body.appendChild(ev);
+  }
+
   body.appendChild(renderInput(c));
-  // Collapsible evidence note
+
+  // Evidence note
   const noteWrap = document.createElement("div"); noteWrap.className = "crit-note-wrap";
   const hasNote = !!(state.notes[c.id]);
   const noteBtn = document.createElement("button"); noteBtn.className = "crit-note-btn";
@@ -1240,6 +2091,7 @@ function renderCriterion(c) {
   noteWrap.appendChild(noteBtn);
   noteWrap.appendChild(noteArea);
   body.appendChild(noteWrap);
+
   el.appendChild(body);
   return el;
 }
@@ -1250,52 +2102,60 @@ function answer(id, val) {
   renderAll();
 }
 
+/* ============================================================
+   RENDER -- inputs
+   ============================================================ */
 function renderInput(c) {
-  const box = document.createElement("div"); box.className = "crit-input";
+  const box = document.createElement("div");
+  box.style.marginBottom = "4px";
+
   if (c.checklist) {
-    const wrap = document.createElement("div");
-    wrap.className = "tri";
-    wrap.style.flexWrap = "wrap";
+    const wrap = document.createElement("div"); wrap.className = "checklist-wrap";
     const cur = Array.isArray(state.answers[c.id]) ? state.answers[c.id] : [];
     for (const item of c.checklist) {
       const lab = document.createElement("label");
-      const inp = document.createElement("input");
-      inp.type = "checkbox";
-      inp.checked = cur.includes(item);
+      const isChecked = cur.includes(item);
+      lab.className = "check-pill" + (isChecked ? " checked" : "");
+      const inp = document.createElement("input"); inp.type = "checkbox"; inp.checked = isChecked;
+      const icon = document.createElement("span"); icon.className = "chk-icon";
+      icon.textContent = isChecked ? "✓" : "";
       inp.onchange = () => {
         const now = Array.isArray(state.answers[c.id]) ? [...state.answers[c.id]] : [];
         if (inp.checked) { if (!now.includes(item)) now.push(item); }
         else { const i = now.indexOf(item); if (i >= 0) now.splice(i, 1); }
         answer(c.id, now);
       };
-      lab.appendChild(inp);
+      lab.appendChild(inp); lab.appendChild(icon);
       lab.appendChild(document.createTextNode(" " + item));
       wrap.appendChild(lab);
     }
     box.appendChild(wrap);
     return box;
   }
+
   if (c.tag === "M") {
     if (c.inverted) {
-      const invNote = document.createElement("div"); invNote.className = "inv-note";
-      invNote.textContent = "5 = good · 1 = deficient";
+      const invNote = document.createElement("div"); invNote.className = "m-inv-note";
+      invNote.textContent = "5 = good, 1 = deficient";
       box.appendChild(invNote);
     }
     const grid = document.createElement("div"); grid.className = "m-anchors";
     for (let lvl = 1; lvl <= 5; lvl++) {
       const a = document.createElement("div");
       a.className = "m-anchor" + (String(state.answers[c.id]) === String(lvl) ? " selected" : "");
-      a.innerHTML = `<div class="lvl">${lvl} · ${lvl===1?"0%":lvl===5?"100%":((lvl-1)/4*100)+"%"}</div><div class="anc-text">${anchorFor(c, lvl)}</div>`;
+      a.innerHTML = `<div class="lvl">${lvl} &middot; ${lvl===1?"0%":lvl===5?"100%":((lvl-1)/4*100)+"%"}</div><div class="anc-text">${anchorFor(c, lvl)}</div>`;
       a.onclick = () => answer(c.id, String(lvl));
       grid.appendChild(a);
     }
     box.appendChild(grid);
-  } else if (c.sponsorable) {
+    return box;
+  }
+
+  if (c.sponsorable) {
     const tri = document.createElement("div"); tri.className = "tri";
     for (const v of ["absent","sponsored","earned"]) {
-      const lab = document.createElement("label");
-      const inp = document.createElement("input");
-      inp.type = "radio"; inp.name = "tri_" + c.id;
+      const lab = document.createElement("label"); lab.className = "tri-pill";
+      const inp = document.createElement("input"); inp.type = "radio"; inp.name = "tri_" + c.id;
       inp.checked = (state.answers[c.id] || "absent") === v;
       inp.onchange = () => answer(c.id, v);
       lab.appendChild(inp);
@@ -1303,46 +2163,49 @@ function renderInput(c) {
       tri.appendChild(lab);
     }
     box.appendChild(tri);
-  } else {
-    const tri = document.createElement("div"); tri.className = "yn-tri";
-    const cur = state.answers[c.id];
-    const curStr = cur === true ? "yes" : cur === false ? "no" : (typeof cur === "string" ? cur : "");
-    for (const [v, label] of [["yes","Yes"],["no","No"],["na","N / A"]]) {
-      const lab = document.createElement("label");
-      if (curStr === v) lab.className = "yn-sel-" + v;
-      const inp = document.createElement("input");
-      inp.type = "radio"; inp.name = "yn_" + c.id; inp.value = v;
-      inp.checked = curStr === v;
-      inp.onchange = () => {
-        answer(c.id, v);
-        tri.querySelectorAll("label").forEach(l => l.className = "");
-        lab.className = "yn-sel-" + v;
-      };
-      lab.appendChild(inp);
-      lab.appendChild(document.createTextNode(" " + label));
-      tri.appendChild(lab);
-    }
-    box.appendChild(tri);
+    return box;
   }
+
+  // Yes / No / N/A
+  const tri = document.createElement("div"); tri.className = "yn-tri";
+  const cur = state.answers[c.id];
+  const curStr = cur === true ? "yes" : cur === false ? "no" : (typeof cur === "string" ? cur : "");
+  for (const [v, label] of [["yes","Yes"],["no","No"],["na","N / A"]]) {
+    const lab = document.createElement("label");
+    lab.className = "yn-pill" + (curStr === v ? " sel-" + v : "");
+    const inp = document.createElement("input"); inp.type = "radio"; inp.name = "yn_" + c.id; inp.value = v;
+    inp.checked = curStr === v;
+    inp.onchange = () => {
+      answer(c.id, v);
+      tri.querySelectorAll(".yn-pill").forEach(l => l.className = "yn-pill");
+      lab.className = "yn-pill sel-" + v;
+    };
+    lab.appendChild(inp);
+    lab.appendChild(document.createTextNode(label));
+    tri.appendChild(lab);
+  }
+  box.appendChild(tri);
   return box;
 }
 
+/* ============================================================
+   RENDER -- AV Protocol
+   ============================================================ */
 function renderAVProtocol() {
-  const box = document.createElement("div");
-  box.className = "sc-inputs";
+  const box = document.createElement("div"); box.className = "sc-inputs";
   box.innerHTML = `<h3>AI Testing Protocol</h3>
-    <div class="note">Run every prompt in a logged-out or fresh browser session. If you get different answers across runs, score the majority result. Log the session details below; they save into your export file.</div>
+    <div class="note">Run every prompt in a logged-out or fresh browser session. If you get different answers across runs, score the majority result. Log session details below; they save into your export file.</div>
     <dl class="av-defs">
-      <dt>Web search on or off</dt><dd>Some AI tools can browse the internet live; others answer from their training data only. Note which mode you used and keep it the same for all prompts in this session.</dd>
+      <dt>Web search on or off</dt><dd>Some AI tools browse the internet live; others answer from training data only. Note which mode you used and keep it the same for all prompts in this session.</dd>
       <dt>Language and region</dt><dd>The language and country your browser was set to during testing (e.g. English, Sri Lanka). Set this explicitly before running prompts; AI answers can vary by region.</dd>
-      <dt>Number of test runs</dt><dd>How many times you sent the same prompt to this AI tool. Run it 2-3 times and score the answer that came up most often; a single run can produce an unusual result.</dd>
+      <dt>Number of test runs</dt><dd>How many times you sent the same prompt to this AI tool. Run it 2 to 3 times and score the answer that came up most often; a single run can produce an unusual result.</dd>
     </dl>`;
   for (const engine of Object.keys(state.engineVersions)) {
-    const lab = document.createElement("label");
-    lab.style.cssText = "display:flex;flex-direction:column;font-size:12px;color:var(--muted);margin-bottom:8px;";
-    lab.textContent = engine + " - session notes (e.g. model version, search on/off, language+region, number of runs, date)";
-    const inp = document.createElement("input");
-    inp.style.cssText = "margin-top:3px;padding:6px 8px;border:1px solid var(--line);font-family:inherit;font-size:13px;";
+    const lab = document.createElement("label"); lab.className = "sc-input-label";
+    lab.style.marginBottom = "10px";
+    lab.textContent = engine + " - session notes (e.g. model version, search on/off, language and region, number of runs, date)";
+    const inp = document.createElement("input"); inp.className = "sc-input-style";
+    inp.style.marginTop = "4px";
     inp.value = state.engineVersions[engine];
     inp.placeholder = "e.g. GPT-5.2, search on, en-LK, 3 runs, 2026-07-08";
     inp.oninput = e => { state.engineVersions[engine] = e.target.value; };
@@ -1352,6 +2215,9 @@ function renderAVProtocol() {
   return box;
 }
 
+/* ============================================================
+   RENDER -- SC social inputs
+   ============================================================ */
 function renderSCInputs() {
   const box = document.createElement("div"); box.className = "sc-inputs";
   const h = document.createElement("h3"); h.textContent = "Social media numbers (last 10 posts)";
@@ -1360,73 +2226,67 @@ function renderSCInputs() {
   note.textContent = "Select the primary platform and enter follower counts. The engagement rate uses the primary platform's followers automatically.";
   box.appendChild(note);
 
-  // Primary platform block
   const platWrap = document.createElement("div");
-  platWrap.innerHTML = `<div style="margin:8px 0 4px 0;font-size:12px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">Primary platform · last 10 posts</div>`;
-
+  platWrap.innerHTML = `<div style="margin:8px 0 4px 0;font-size:11px;color:var(--fg-muted);letter-spacing:1.5px;text-transform:uppercase;">Primary platform &middot; last 10 posts</div>`;
   const platRow = document.createElement("div");
-  platRow.style.cssText = "display:flex;gap:16px;align-items:end;margin-bottom:10px;flex-wrap:wrap;";
-
+  platRow.style.cssText = "display:flex;gap:14px;align-items:flex-end;margin-bottom:12px;flex-wrap:wrap;";
   const _platforms = ["Instagram","Facebook","TikTok","YouTube","LinkedIn","X / Twitter"];
   const _plat = state.social.primary.platform || "Instagram";
   const _isOther = !["Instagram","Facebook"].includes(_plat);
-  const _iStyle = "padding:6px 8px;border:1px solid var(--line);font-family:inherit;font-size:13px;background:var(--bg-2);color:var(--fg);border-radius:var(--r-sm);";
   const _opts = _platforms.map(p => `<option value="${p}"${p===_plat?" selected":""}>${p}</option>`).join("");
+  const iStyle = "class=\"sc-input-style\"";
 
   platRow.innerHTML = `
-    <label style="display:flex;flex-direction:column;font-size:12px;color:var(--muted);">primary platform
-      <select id="sc_platform" style="${_iStyle}min-width:130px;">${_opts}</select>
+    <label class="sc-input-label">Primary platform
+      <select id="sc_platform" ${iStyle} style="min-width:130px;">${_opts}</select>
     </label>
-    <label style="display:flex;flex-direction:column;font-size:12px;color:var(--muted);">Instagram followers
-      <input id="sc_ig" type="number" min="0" value="${state.social.igFollowers}" style="${_iStyle}width:130px;">
+    <label class="sc-input-label">Instagram followers
+      <input id="sc_ig" type="number" min="0" value="${state.social.igFollowers}" ${iStyle} style="width:130px;">
     </label>
-    <label style="display:flex;flex-direction:column;font-size:12px;color:var(--muted);">Facebook followers
-      <input id="sc_fb" type="number" min="0" value="${state.social.fbFollowers}" style="${_iStyle}width:130px;">
+    <label class="sc-input-label">Facebook followers
+      <input id="sc_fb" type="number" min="0" value="${state.social.fbFollowers}" ${iStyle} style="width:130px;">
     </label>
-    ${_isOther ? `<label style="display:flex;flex-direction:column;font-size:12px;color:var(--muted);">${_plat} followers
-      <input id="sc_primary_followers" type="number" min="0" value="${state.social.primary.followers}" style="${_iStyle}width:130px;">
+    ${_isOther ? `<label class="sc-input-label">${_plat} followers
+      <input id="sc_primary_followers" type="number" min="0" value="${state.social.primary.followers}" ${iStyle} style="width:130px;">
     </label>` : ""}
   `;
   platWrap.appendChild(platRow);
 
-  // Primary followers for ER: IG if primary=Instagram, FB if primary=Facebook, otherwise state.social.primary.followers
   const _primaryFollowers = _plat === "Instagram" ? (state.social.igFollowers || 0)
     : _plat === "Facebook" ? (state.social.fbFollowers || 0)
     : (state.social.primary.followers || 0);
 
-  const header = document.createElement("div");
-  header.className = "platform-row header";
+  const header = document.createElement("div"); header.className = "platform-row header";
   header.innerHTML = "<div>Post #</div><div>shares</div><div>saves</div><div>comments</div><div>likes</div><div>weighted</div><div>ER %</div>";
   platWrap.appendChild(header);
+
   for (let i = 0; i < 10; i++) {
     const r = document.createElement("div"); r.className = "platform-row";
     const w = (Number(state.social.primary.posts[i].shares)||0)*5 + (Number(state.social.primary.posts[i].saves)||0)*3 +
               (Number(state.social.primary.posts[i].comments)||0)*2 + (Number(state.social.primary.posts[i].likes)||0)*1;
     const er = _primaryFollowers > 0 ? (w / _primaryFollowers * 100).toFixed(3) : "–";
     r.innerHTML = `
-      <div>post ${i+1}</div>
+      <div style="font-size:11px;color:var(--fg-muted);">post ${i+1}</div>
       <div><input type="number" min="0" data-post="${i}" data-field="shares" value="${state.social.primary.posts[i].shares}"></div>
       <div><input type="number" min="0" data-post="${i}" data-field="saves" value="${state.social.primary.posts[i].saves}"></div>
       <div><input type="number" min="0" data-post="${i}" data-field="comments" value="${state.social.primary.posts[i].comments}"></div>
       <div><input type="number" min="0" data-post="${i}" data-field="likes" value="${state.social.primary.posts[i].likes}"></div>
-      <div style="color:var(--muted);">${w}</div>
-      <div style="color:var(--muted);">${er}</div>
+      <div style="color:var(--fg-muted);font-size:12px;">${w}</div>
+      <div style="color:var(--fg-muted);font-size:12px;">${er}</div>
     `;
     platWrap.appendChild(r);
   }
   box.appendChild(platWrap);
 
-  const readout = document.createElement("div");
-  readout.className = "er-readout";
+  const readout = document.createElement("div"); readout.className = "er-readout";
   const { er, avgWeighted } = computeERAndFloor(state.social.primary.posts, _primaryFollowers);
   readout.innerHTML = `
-    <div><div class="label">weighted ER</div><div class="val">${er==null?"–":er.toFixed(2)+"%"}</div></div>
-    <div><div class="label">avg weighted / post</div><div class="val">${avgWeighted==null?"–":avgWeighted.toFixed(1)}</div></div>
+    <div><div class="label">Weighted ER</div><div class="val">${er==null?"–":er.toFixed(2)+"%"}</div></div>
+    <div><div class="label">Avg weighted / post</div><div class="val">${avgWeighted==null?"–":avgWeighted.toFixed(1)}</div></div>
     <div><div class="label">FB : IG ratio</div><div class="val">${state.social.igFollowers>0?(state.social.fbFollowers/state.social.igFollowers).toFixed(2):"–"}</div></div>
   `;
   box.appendChild(readout);
 
-  // Wire inputs
   setTimeout(() => {
     const p = document.getElementById("sc_platform");
     if (p) p.onchange = e => { state.social.primary.platform = e.target.value; renderAll(); };
@@ -1450,26 +2310,27 @@ function renderSCInputs() {
 }
 
 /* ============================================================
-   RADAR (hand-drawn SVG, 6 axes, animation on confirm)
+   RADAR -- SVG spider chart, brand green accent
    ============================================================ */
 const RADAR_DIMS = ["SV","AV","DE","BA","SC","RC"];
 
-function renderRadar(size, dark) {
+function scoreColor(v) {
+  if (v < 40) return "#EF4444";
+  if (v < 60) return "#F59E0B";
+  if (v < 80) return "#22C55E";
+  return "#03AF97";
+}
+
+function renderRadar(size) {
   const s = size || 240;
   const cx = s/2, cy = s/2;
-  const r = s * 0.42;
+  const r = s * 0.40;
   const gridLevels = [20, 40, 60, 80, 100];
   const angleFor = i => (Math.PI * 2 * i / RADAR_DIMS.length) - Math.PI/2;
-  const pad = 30;
-  // Color scheme based on dark/light context
-  const gridOuter = dark ? "#2e2e2e" : "#d8d8d8";
-  const gridInner = dark ? "#222" : "#ececec";
-  const axisColor = dark ? "#2a2a2a" : "#d0d0d0";
-  const labelColor = dark ? "#888" : "#1e1e1e";
-  const naColor = dark ? "#444" : "#9a9a9a";
-  const ringLabelColor = dark ? "#444" : "#b8b8b8";
-  const dotHalo = dark ? "#161616" : "#ffffff";
+  const pad = 32;
+
   let svg = `<svg width="${s + pad*2}" height="${s + pad*2}" viewBox="${-pad} ${-pad} ${s + pad*2} ${s + pad*2}" xmlns="http://www.w3.org/2000/svg">`;
+
   // Concentric gridlines
   for (const g of gridLevels) {
     const pts = RADAR_DIMS.map((_, i) => {
@@ -1478,26 +2339,27 @@ function renderRadar(size, dark) {
       return (cx + Math.cos(a)*rad).toFixed(1) + "," + (cy + Math.sin(a)*rad).toFixed(1);
     }).join(" ");
     const isOuter = g === 100;
-    svg += `<polygon points="${pts}" fill="${isOuter ? (dark?"#1e1e1e":"#f5f5f5") : "none"}" stroke="${isOuter ? gridOuter : gridInner}" stroke-width="${isOuter ? "1" : "0.8"}"/>`;
-    // Ring percentage label on the bottom-right axis (between axis 0 and 1)
-    if (g < 100) {
+    svg += `<polygon points="${pts}" fill="${isOuter ? "rgba(22,28,43,1)" : "none"}" stroke="${isOuter ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.05)"}" stroke-width="${isOuter ? "1" : "0.7"}"/>`;
+    if (g < 100 && g >= 40) {
       const labelA = angleFor(0) + (Math.PI * 2 / RADAR_DIMS.length) * 0.5;
       const lrad = r * (g / 100);
       const lx = cx + Math.cos(labelA) * lrad, ly = cy + Math.sin(labelA) * lrad;
-      svg += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="${ringLabelColor}">${g}</text>`;
+      svg += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="6.5" fill="rgba(255,255,255,0.18)">${g}</text>`;
     }
   }
+
   // Axes
   for (let i = 0; i < RADAR_DIMS.length; i++) {
     const a = angleFor(i);
     const x2 = cx + Math.cos(a)*r, y2 = cy + Math.sin(a)*r;
-    svg += `<line x1="${cx}" y1="${cy}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${axisColor}" stroke-width="0.8"/>`;
+    svg += `<line x1="${cx}" y1="${cy}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="rgba(255,255,255,0.08)" stroke-width="0.7"/>`;
     const applicable = buildPointsModel(state.flags).dimApplicable[RADAR_DIMS[i]];
-    const lx = cx + Math.cos(a)*(r+18), ly = cy + Math.sin(a)*(r+18);
+    const lx = cx + Math.cos(a)*(r+20), ly = cy + Math.sin(a)*(r+20);
     const label = applicable ? RADAR_DIMS[i] : RADAR_DIMS[i] + " n/a";
-    const fill = applicable ? labelColor : naColor;
-    svg += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="${fill}" font-weight="600" letter-spacing="1">${label}</text>`;
+    const fill = applicable ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.22)";
+    svg += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="${fill}" font-weight="700" letter-spacing="1.5">${label}</text>`;
   }
+
   // Data polygon
   const pts = RADAR_DIMS.map((d, i) => {
     const v = state.radarVals[d];
@@ -1505,16 +2367,17 @@ function renderRadar(size, dark) {
     const a = angleFor(i);
     return (cx + Math.cos(a)*rad).toFixed(1) + "," + (cy + Math.sin(a)*rad).toFixed(1);
   }).join(" ");
-  svg += `<polygon points="${pts}" fill="#e28f26" fill-opacity="0.22" stroke="#e28f26" stroke-width="2.5"/>`;
-  // Data dots with halo
+  svg += `<polygon points="${pts}" fill="rgba(3,175,151,0.15)" stroke="#03AF97" stroke-width="2"/>`;
+
+  // Dots
   for (let i = 0; i < RADAR_DIMS.length; i++) {
     const v = state.radarVals[RADAR_DIMS[i]];
     if (v === 0) continue;
     const rad = r * (v / 100);
     const a = angleFor(i);
     const px = cx + Math.cos(a)*rad, py = cy + Math.sin(a)*rad;
-    svg += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="5" fill="${dotHalo}"/>`;
-    svg += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3.5" fill="#e28f26"/>`;
+    svg += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="5" fill="rgba(15,17,23,0.9)"/>`;
+    svg += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3" fill="#03AF97"/>`;
   }
   svg += "</svg>";
   return svg;
@@ -1523,12 +2386,11 @@ function renderRadar(size, dark) {
 function animateRadarAxis(dim, target) {
   const start = state.radarVals[dim];
   const t0 = performance.now();
-  const dur = 260;
+  const dur = 320;
   function step(now) {
     const p = Math.min(1, (now - t0) / dur);
     const eased = 1 - Math.pow(1 - p, 3);
     state.radarVals[dim] = start + (target - start) * eased;
-    // Only re-render the radar rail (cheap), not the whole panel
     const rail = document.getElementById("rail");
     if (rail) rail.innerHTML = radarRailHTML();
     if (p < 1) requestAnimationFrame(step);
@@ -1537,30 +2399,41 @@ function animateRadarAxis(dim, target) {
 }
 
 /* ============================================================
-   RADAR RAIL (sticky sidebar summary)
+   SCORE RING SVG (animated, color-shifting by score range)
    ============================================================ */
-function scoreRingSVG(value, size, dark) {
-  const arcR = size * 0.39;
+function scoreRingSVG(value, size) {
+  const arcR = size * 0.38;
   const circ = 2 * Math.PI * arcR;
   const pct = Math.min(Math.max(value, 0), 100) / 100;
   const dash = circ * pct;
   const gap = circ - dash;
   const offset = circ * 0.25;
-  const fg = dark ? "#ffffff" : "#1e1e1e";
-  const sub = dark ? "#555" : "#9a9a9a";
-  const track = dark ? "#2a2a2a" : "#ececec";
+  const col = scoreColor(value);
+  const glowId = "glow_" + Math.round(value);
   return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="${size/2}" cy="${size/2}" r="${arcR}" fill="none" stroke="${track}" stroke-width="${size*0.065}"/>
-    <circle cx="${size/2}" cy="${size/2}" r="${arcR}" fill="none" stroke="#e28f26" stroke-width="${size*0.065}"
+    <defs>
+      <filter id="${glowId}" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="3" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <circle cx="${size/2}" cy="${size/2}" r="${arcR}" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="${size*0.07}"/>
+    <circle cx="${size/2}" cy="${size/2}" r="${arcR}" fill="none" stroke="${col}" stroke-width="${size*0.07}"
       stroke-dasharray="${dash.toFixed(2)} ${gap.toFixed(2)}"
-      stroke-dashoffset="${offset.toFixed(2)}" stroke-linecap="round"/>
-    <text x="${size/2}" y="${size/2 - size*0.06}" text-anchor="middle" dominant-baseline="middle"
-      font-size="${size*0.2}" font-weight="600" fill="${fg}" font-family="Roboto,system-ui,sans-serif">${value.toFixed(1)}</text>
-    <text x="${size/2}" y="${size/2 + size*0.12}" text-anchor="middle" dominant-baseline="middle"
-      font-size="${size*0.09}" fill="${sub}" letter-spacing="1" font-family="Roboto,system-ui,sans-serif">/ 100</text>
+      stroke-dashoffset="${offset.toFixed(2)}" stroke-linecap="round"
+      filter="url(#${glowId})"/>
+    <text x="${size/2}" y="${size/2 - size*0.07}" text-anchor="middle" dominant-baseline="middle"
+      font-size="${size*0.22}" font-weight="700" fill="#E8ECF0"
+      font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">${value.toFixed(1)}</text>
+    <text x="${size/2}" y="${size/2 + size*0.13}" text-anchor="middle" dominant-baseline="middle"
+      font-size="${size*0.085}" fill="rgba(255,255,255,0.35)" letter-spacing="1.5"
+      font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">/ 100</text>
   </svg>`;
 }
 
+/* ============================================================
+   RADAR RAIL (sticky sidebar)
+   ============================================================ */
 function radarRailHTML() {
   const dims = RADAR_DIMS.map(d => {
     const s = dimensionScore(d, state);
@@ -1569,29 +2442,94 @@ function radarRailHTML() {
   });
   const comp = composite(state);
   const band = maturityBand(comp);
+  const col = scoreColor(comp);
   return `
     <div class="radar-card">
-      <h4>Composite VISTA score</h4>
-      <div style="display:flex;justify-content:center;margin:8px 0 4px 0;">${scoreRingSVG(comp, 120, true)}</div>
-      <div style="text-align:center;">${`<span class="band ${band.cls}">${band.label}</span>`}</div>
-      <div style="margin-top:16px;display:flex;justify-content:center;">${renderRadar(220, true)}</div>
+      <h4>VISTA Score</h4>
+      <div class="rail-score-center">${scoreRingSVG(comp, 130)}</div>
+      <div class="rail-band-center"><span class="band-pill ${band.cls}">${band.label}</span></div>
+      <div class="radar-center">${renderRadar(210)}</div>
       <ul class="dim-list">
-        ${dims.map(x => { const m = DIM_META.find(d=>d.key===x.d); return `<li class="${x.conf?"confirmed":""}"><span>${x.d} · ${m?m.short:x.d}</span><span class="val">${x.s===null?"n/a":(x.conf?x.s.toFixed(1):"–")}</span></li>`; }).join("")}
+        ${dims.map(x => {
+          const m = DIM_META.find(d => d.key === x.d);
+          const valStr = x.s === null ? "n/a" : (x.conf ? x.s.toFixed(1) : "&ndash;");
+          const valClass = x.s !== null && x.conf ? "val-confirmed" : "val-unconfirmed";
+          return `<li>
+            <span class="dim-list-label">${x.d} &middot; ${m ? m.short : x.d}</span>
+            <span class="dim-list-val ${valClass}">${valStr}</span>
+          </li>`;
+        }).join("")}
       </ul>
     </div>
   `;
 }
 
 /* ============================================================
-   SUMMARY tab
+   SUB-COMPONENT BAR CHART
+   ============================================================ */
+function renderSubComponentBars() {
+  const section = document.createElement("div"); section.className = "subcomp-chart-section";
+  const title = document.createElement("div"); title.className = "chart-section-title";
+  title.textContent = "Sub-component breakdown";
+  section.appendChild(title);
+
+  const model = buildPointsModel(state.flags);
+
+  for (const dimMeta of DIM_META) {
+    const dim = dimMeta.key;
+    // Collect sub-components for this dimension
+    const subcomps = [];
+    const seen = {};
+    for (const c of CRITERIA) {
+      if (c.dimension !== dim) continue;
+      if (seen[c.subComponent]) continue;
+      seen[c.subComponent] = true;
+      const applicable = CRITERIA.filter(x => x.subComponent === c.subComponent && isApplicable(x, state.flags));
+      if (applicable.length === 0) continue;
+      // Calculate sub-component score as % of its point budget
+      let earned = 0;
+      for (const ac of applicable) earned += critValue(ac, state, model);
+      const max = c.subComponentPoints;
+      const pct = max > 0 ? Math.min(100, (earned / max) * 100) : 0;
+      // Shorten label: remove "SC1.1 " prefix style
+      const label = c.subComponent.replace(/^SC\d+\.\d+\s+/i, "").replace(/^SC\d+\.\d+/, "");
+      subcomps.push({ label, pct, earned, max });
+    }
+    if (subcomps.length === 0) continue;
+
+    const group = document.createElement("div"); group.className = "chart-dim-group";
+    const dimLabel = document.createElement("div"); dimLabel.className = "chart-dim-label";
+    dimLabel.textContent = dim + " · " + dimMeta.name;
+    group.appendChild(dimLabel);
+
+    for (const sc of subcomps) {
+      const barRow = document.createElement("div"); barRow.className = "bar-row";
+      const pct = sc.pct;
+      const col = pct < 40 ? "var(--red)" : pct < 60 ? "var(--amber)" : pct < 80 ? "var(--green)" : "var(--accent)";
+      barRow.innerHTML = `
+        <div class="bar-label">${sc.label}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct.toFixed(1)}%;background:${col};"></div></div>
+        <div class="bar-score" style="color:${col};">${pct.toFixed(0)}%</div>
+      `;
+      group.appendChild(barRow);
+    }
+    section.appendChild(group);
+  }
+  return section;
+}
+
+/* ============================================================
+   SUMMARY TAB
    ============================================================ */
 function renderSummary() {
   const wrap = document.createElement("div");
+
+  // Header
   const head = document.createElement("div"); head.className = "summary-header";
-  const h = document.createElement("h2");
-  h.innerHTML = `<span class="dim-code">Σ</span>Summary & export`;
-  head.appendChild(h);
-  const actions = document.createElement("div"); actions.className = "actions";
+  const heading = document.createElement("div"); heading.className = "dim-heading";
+  heading.innerHTML = `<span class="dim-code-badge">&#x3A3;</span><span class="dim-title">Summary &amp; Export</span>`;
+  head.appendChild(heading);
+  const actions = document.createElement("div"); actions.className = "summary-actions";
   const eBtn = document.createElement("button"); eBtn.className = "ghost"; eBtn.textContent = "Export JSON";
   eBtn.onclick = exportJSON;
   const iBtn = document.createElement("button"); iBtn.className = "ghost"; iBtn.textContent = "Import JSON";
@@ -1599,155 +2537,191 @@ function renderSummary() {
   const pBtn = document.createElement("button"); pBtn.className = "ghost"; pBtn.textContent = "Print / PDF";
   pBtn.onclick = () => window.print();
   actions.appendChild(eBtn); actions.appendChild(iBtn); actions.appendChild(pBtn);
-  const importNote = document.createElement("div"); importNote.className = "import-note";
-  importNote.textContent = "Import a .json file previously exported from this tool to resume or merge an earlier session.";
-  actions.appendChild(importNote);
   head.appendChild(actions);
   wrap.appendChild(head);
 
+  const importNote = document.createElement("div"); importNote.className = "import-note";
+  importNote.textContent = "Import a .json file previously exported from this tool to resume or merge an earlier session.";
+  wrap.appendChild(importNote);
+
   // Metadata block
-  const metaBox = document.createElement("div");
-  metaBox.className = "sc-inputs";
+  const metaBox = document.createElement("div"); metaBox.className = "sc-inputs"; metaBox.style.marginTop = "24px";
   metaBox.innerHTML = `<h3>About this brand</h3>
-    <div class="note">Fill this in before you start. It saves with your results and helps identify the report.</div>`;
+    <div class="note">Fill this in before you start. It saves with your results and identifies the report.</div>`;
   const grid = document.createElement("div"); grid.className = "meta-grid";
   const fields = [
     { key:"brand", label:"brand name" },
     { key:"country", label:"country" },
     { key:"sector", label:"sector" },
-    { key:"launchYear", label:"year the brand was founded", type:"text", placeholder:"e.g. 2018", maxlength:4, inputmode:"numeric" },
+    { key:"launchYear", label:"year founded", type:"text", placeholder:"e.g. 2018", maxlength:4, inputmode:"numeric" },
     { key:"assessmentDate", label:"assessment date", type:"date" }
   ];
   for (const f of fields) {
-    const l = document.createElement("label");
-    l.textContent = f.label;
+    const l = document.createElement("label"); l.textContent = f.label;
     const inp = document.createElement("input");
-    inp.type = f.type || "text";
-    inp.value = state.meta[f.key] || "";
+    inp.type = f.type || "text"; inp.value = state.meta[f.key] || "";
     if (f.placeholder) inp.placeholder = f.placeholder;
     if (f.maxlength) inp.maxLength = f.maxlength;
     if (f.inputmode) inp.inputMode = f.inputmode;
     inp.oninput = e => { state.meta[f.key] = e.target.value; renderAll(); };
-    l.appendChild(inp);
-    grid.appendChild(l);
+    l.appendChild(inp); grid.appendChild(l);
   }
   metaBox.appendChild(grid);
   wrap.appendChild(metaBox);
 
-  // Sector applicability flags (published rules, applicability-rules.md).
-  // Set once per assessment. Turning a flag off marks its criteria N/A and
-  // renormalizes points. Blocked if fewer than 4 dimensions would remain applicable.
-  const sectorFlagBox = document.createElement("div");
-  sectorFlagBox.className = "sc-inputs";
+  // Applicability flags
+  const sectorFlagBox = document.createElement("div"); sectorFlagBox.className = "sc-inputs";
   sectorFlagBox.innerHTML = `<h3>Which of these apply to this brand?</h3>
-    <div class="note">Tick only what is true for this brand. Questions that don't apply will be skipped automatically and won't count against the score.</div>`;
-  const fGrid = document.createElement("div");
-  fGrid.className = "flags-grid";
+    <div class="note">Tick only what is true for this brand. Questions that don't apply are skipped automatically and won't count against the score.</div>`;
+  const fGrid = document.createElement("div"); fGrid.className = "flags-grid";
   const errSlot = document.createElement("div");
   for (const [flag, def] of Object.entries(APPLICABILITY_FLAGS)) {
     const lab = document.createElement("label");
-    const inp = document.createElement("input");
-    inp.type = "checkbox";
-    inp.checked = !!state.flags[flag];
+    const inp = document.createElement("input"); inp.type = "checkbox"; inp.checked = !!state.flags[flag];
     inp.onchange = () => {
       const proposed = { ...state.flags, [flag]: inp.checked };
       const applDims = Object.values(buildPointsModel(proposed).dimApplicable).filter(Boolean).length;
       if (applDims < 4) {
-        inp.checked = !inp.checked;  // revert
-        errSlot.innerHTML = `<div class="flag-error">Cannot disable: this combination would leave only ${applDims} sections active. At least 4 sections must apply.</div>`;
+        inp.checked = !inp.checked;
+        errSlot.innerHTML = `<div class="flag-error">Cannot disable: this combination would leave only ${applDims} sections active. At least 4 must apply.</div>`;
         return;
       }
       errSlot.innerHTML = "";
-      state.flags = proposed;
-      state.flagsTouched = true;
-      renderAll();
+      state.flags = proposed; state.flagsTouched = true; renderAll();
     };
     lab.appendChild(inp);
     const span = document.createElement("span");
     span.innerHTML = `<strong>${FLAG_DISPLAY[flag]}</strong><br><span class="flag-def">${def}</span>`;
-    lab.appendChild(span);
-    fGrid.appendChild(lab);
+    lab.appendChild(span); fGrid.appendChild(lab);
   }
-  sectorFlagBox.appendChild(fGrid);
-  sectorFlagBox.appendChild(errSlot);
+  sectorFlagBox.appendChild(fGrid); sectorFlagBox.appendChild(errSlot);
   wrap.appendChild(sectorFlagBox);
 
-  // Big radar + composite
+  // Score section header
+  const scoreDivider = document.createElement("div"); scoreDivider.className = "section-divider";
+  scoreDivider.textContent = "Scores";
+  wrap.appendChild(scoreDivider);
+
+  // Two-column: ring + radar | dimension cards
   const comp = composite(state);
   const band = maturityBand(comp);
-  const bigCard = document.createElement("div");
-  bigCard.className = "summary-score-card";
-  bigCard.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;">
-      <div>
-        <h4>Composite VISTA score</h4>
-        <div style="margin:12px 0 4px 0;">${scoreRingSVG(comp, 180, true)}</div>
-        <div style="margin-top:4px;"><span class="band ${band.cls}" style="font-size:12px;letter-spacing:3px;padding:5px 14px;">${band.label}</span></div>
-        <ul class="dim-list" style="margin-top:24px;">
-          ${RADAR_DIMS.map(d => {
-            const s = dimensionScore(d, state);
-            const val = s === null ? "n/a" : `${s.toFixed(1)}${state.confirmed[d]?"":" *"}`;
-            const short = DIM_META.find(x=>x.key===d)?.short || d;
-            return `<li class="${state.confirmed[d]?"confirmed":""}"><span>${d} · ${short}</span><span class="val">${val}</span></li>`;
-          }).join("")}
-        </ul>
-        <div style="font-size:11px;color:var(--muted);margin-top:8px;">* Score not yet confirmed. Go to that tab and click "Confirm section" to lock it in before exporting.</div>
-      </div>
-      <div style="display:flex;justify-content:center;">${renderRadar(360, true)}</div>
-    </div>
+  const scoreGrid = document.createElement("div"); scoreGrid.className = "summary-score-grid";
+
+  // Left: ring + radar
+  const leftCard = document.createElement("div"); leftCard.className = "summary-card";
+  leftCard.innerHTML = `
+    <div style="font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--fg-muted);margin-bottom:12px;">Composite VISTA Score</div>
+    <div class="score-ring-center">${scoreRingSVG(comp, 200)}</div>
+    <div class="score-band-center"><span class="band-pill ${band.cls}">${band.label}</span></div>
   `;
-  wrap.appendChild(bigCard);
+  const radarDiv = document.createElement("div");
+  radarDiv.style.cssText = "display:flex;justify-content:center;margin-top:8px;";
+  radarDiv.innerHTML = renderRadar(320);
+  leftCard.appendChild(radarDiv);
+  scoreGrid.appendChild(leftCard);
+
+  // Right: dimension score cards
+  const rightCard = document.createElement("div"); rightCard.className = "summary-card";
+  rightCard.innerHTML = `<div style="font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--fg-muted);margin-bottom:16px;">Dimension Scores</div>`;
+  const dimCards = document.createElement("div"); dimCards.className = "dim-score-cards";
+  for (const d of RADAR_DIMS) {
+    const s = dimensionScore(d, state);
+    const conf = state.confirmed[d];
+    const meta = DIM_META.find(x => x.key === d);
+    const valStr = s === null ? "n/a" : (conf ? s.toFixed(1) : s.toFixed(1) + " *");
+    const col = s !== null ? scoreColor(s) : "var(--fg-muted)";
+    const pct = s !== null ? Math.min(100, s) : 0;
+    const card = document.createElement("div"); card.className = "dim-score-card";
+    card.innerHTML = `
+      <div class="dim-score-card-top">
+        <span class="dim-score-name">${d} &middot; ${meta ? meta.name : d}</span>
+        <span class="dim-score-badge" style="color:${col};">${valStr}</span>
+      </div>
+      <div class="dim-score-bar-bg">
+        <div class="dim-score-bar-fill" style="width:${pct.toFixed(1)}%;background:${col};"></div>
+      </div>
+    `;
+    dimCards.appendChild(card);
+  }
+  rightCard.appendChild(dimCards);
+  const unconfNote = document.createElement("div");
+  unconfNote.style.cssText = "font-size:10px;color:var(--fg-muted);margin-top:12px;";
+  unconfNote.textContent = "* Score not yet confirmed. Go to that tab and click Confirm section to lock it in before exporting.";
+  rightCard.appendChild(unconfNote);
+  scoreGrid.appendChild(rightCard);
+  wrap.appendChild(scoreGrid);
+
+  // Sub-component bar chart
+  const chartDivider = document.createElement("div"); chartDivider.className = "section-divider";
+  chartDivider.textContent = "Sub-component breakdown";
+  wrap.appendChild(chartDivider);
+  wrap.appendChild(renderSubComponentBars());
 
   // Red flags
+  const flagsDivider = document.createElement("div"); flagsDivider.className = "section-divider";
+  flagsDivider.textContent = "Warning signals";
+  wrap.appendChild(flagsDivider);
+
   const flags = computeFlags(state);
-  const flagBox = document.createElement("div"); flagBox.className = "flags";
-  flagBox.innerHTML = `<h4>Warning signals <span style="font-weight:400;letter-spacing:0;text-transform:none;font-size:11px;color:var(--muted);">· shown separately, not deducted from the score</span></h4>`;
+  const flagsSection = document.createElement("div"); flagsSection.className = "flags-section";
+  const flagsTitle = document.createElement("div"); flagsTitle.className = "flags-section-title";
+  flagsTitle.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Warning signals <span style="font-weight:400;font-size:10px;color:var(--fg-muted);letter-spacing:0;text-transform:none;">not deducted from score</span>`;
+  flagsSection.appendChild(flagsTitle);
   if (!flags.length) {
-    const e = document.createElement("div"); e.className = "empty-flags";
-    e.textContent = "All clear. No warning signals detected.";
-    flagBox.appendChild(e);
+    const ok = document.createElement("div"); ok.className = "empty-flags";
+    ok.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> All clear. No warning signals detected.`;
+    flagsSection.appendChild(ok);
   } else {
     for (const f of flags) {
-      const c = document.createElement("div");
-      c.className = "flag-chip" + (f.provisional ? " provisional" : "");
-      c.textContent = f.text;
-      flagBox.appendChild(c);
+      const alert = document.createElement("div"); alert.className = "flag-alert critical";
+      alert.innerHTML = `<svg class="flag-icon flag-alert-icon-critical" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div>
+          <div class="flag-text">${f.text}</div>
+          ${f.provisional ? '<div class="flag-prov">early result, verify after 5+ assessments</div>' : ""}
+        </div>`;
+      flagsSection.appendChild(alert);
     }
   }
-  wrap.appendChild(flagBox);
+  wrap.appendChild(flagsSection);
 
-  // Focus areas: bottom-scoring confirmed dimensions
+  // Focus areas
   const scored = RADAR_DIMS
     .map(d => ({ d, s: dimensionScore(d, state), confirmed: state.confirmed[d] }))
     .filter(x => x.s !== null)
     .sort((a, b) => a.s - b.s);
+
   if (scored.length > 0) {
-    const focusBox = document.createElement("div"); focusBox.className = "focus-box";
-    focusBox.innerHTML = `<h4>Where to focus next <span style="font-weight:400;letter-spacing:0;text-transform:none;font-size:11px;color:var(--muted);">· lowest-scoring dimensions</span></h4>`;
-    const list = document.createElement("ul"); list.className = "focus-list";
+    const focusDivider = document.createElement("div"); focusDivider.className = "section-divider";
+    focusDivider.textContent = "Where to focus next";
+    wrap.appendChild(focusDivider);
+
+    const focusSection = document.createElement("div"); focusSection.className = "focus-section";
+    focusSection.innerHTML = `<div style="font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--fg-muted);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--line);">Lowest-scoring dimensions</div>`;
+    const focusList = document.createElement("ul"); focusList.className = "focus-list";
     const top3 = scored.slice(0, Math.min(3, scored.length));
     for (const { d, s, confirmed } of top3) {
       const meta = DIM_META.find(x => x.key === d);
       const prog = progressFor(d);
-      const li = document.createElement("li");
       const gap = prog.applicable - prog.answered;
-      li.innerHTML = `<span class="focus-dim">${d} · ${meta?.short || d}</span>
+      const li = document.createElement("li"); li.className = "focus-item";
+      li.innerHTML = `<span class="focus-dim">${d} &middot; ${meta ? meta.name : d}</span>
         <span class="focus-score">${s.toFixed(1)}<span class="focus-max"> / 100</span></span>
-        <span class="focus-note">${gap > 0 ? `${gap} unanswered` : confirmed ? "complete" : "not confirmed"}</span>`;
-      list.appendChild(li);
+        <span class="focus-note">${gap > 0 ? gap + " unanswered" : confirmed ? "complete" : "not confirmed"}</span>`;
+      focusList.appendChild(li);
     }
-    focusBox.appendChild(list);
-    wrap.appendChild(focusBox);
+    focusSection.appendChild(focusList);
+    wrap.appendChild(focusSection);
   }
 
-  // Sector percentile, phase 2 stub
-  const pctBox = document.createElement("div"); pctBox.style.marginTop = "24px";
-  pctBox.innerHTML = `<h4 style="margin:0 0 6px 0;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:500;">How this brand compares</h4>
-    <div style="font-size:12px;color:var(--muted);font-style:italic;">Available once 5 or more brands in this sector have been assessed.</div>`;
+  // Benchmarking stub
+  const pctBox = document.createElement("div");
+  pctBox.style.cssText = "margin-top:24px;padding:20px 24px;background:var(--bg-card);border:1px solid var(--line);border-radius:var(--r);";
+  pctBox.innerHTML = `<div style="font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--fg-muted);margin-bottom:8px;">How this brand compares</div>
+    <div style="font-size:12px;color:var(--fg-muted);">Available once 5 or more brands in this sector have been assessed.</div>`;
   wrap.appendChild(pctBox);
 
   const authorLine = document.createElement("div");
-  authorLine.style.cssText = "margin-top:32px;font-size:11px;color:var(--muted);letter-spacing:0.5px;";
+  authorLine.style.cssText = "margin-top:28px;font-size:11px;color:var(--fg-muted);letter-spacing:0.3px;";
   authorLine.textContent = "Methodology authored by Adhit Satish.";
   wrap.appendChild(authorLine);
 
@@ -1794,25 +2768,17 @@ function wireImport() {
     rd.onload = () => {
       try {
         const p = JSON.parse(rd.result);
-        // Shallow-merge, current state wins. A criterion already answered in
-        // this session is never overwritten by an import; the discarded
-        // import value is logged so the researcher can see what did not land.
         if (p.answers) {
           for (const [cid, val] of Object.entries(p.answers)) {
             const crit = CRITERIA.find(c => c.id === cid);
             if (!crit) { console.warn(`import skipped for ${cid}, unknown criterion`); continue; }
-            if (isAnswered(crit)) {
-              console.info(`import skipped for ${cid}, existing state value = ${JSON.stringify(state.answers[cid])}`);
-              continue;
-            }
+            if (isAnswered(crit)) { console.info(`import skipped for ${cid}, existing state value`); continue; }
             state.answers[cid] = val;
           }
         }
-        // Metadata and SC inputs: existing populated values win, imports fill blanks only.
         if (p.meta) {
           for (const [k, v] of Object.entries(p.meta)) {
             if (state.meta[k] === "" || state.meta[k] == null) state.meta[k] = v;
-            else if (v !== state.meta[k]) console.info(`import skipped for meta.${k}, existing value kept`);
           }
         }
         if (p.social) {
@@ -1820,18 +2786,13 @@ function wireImport() {
           const scEmpty = cur.primary.followers === 0 && cur.igFollowers === 0 && cur.fbFollowers === 0 &&
             cur.primary.posts.every(x => !x.shares && !x.saves && !x.comments && !x.likes);
           if (scEmpty) state.social = { ...cur, ...p.social };
-          else console.info("import skipped for SC inputs, existing values kept");
         }
-        if (p.applicabilityFlags) {
-          if (!state.flagsTouched) state.flags = { ...state.flags, ...p.applicabilityFlags };
-          else console.info("import skipped for applicability flags, existing values kept");
-        }
+        if (p.applicabilityFlags && !state.flagsTouched) state.flags = { ...state.flags, ...p.applicabilityFlags };
         if (p.engineVersions) {
           for (const [k, v] of Object.entries(p.engineVersions)) {
             if (!state.engineVersions[k]) state.engineVersions[k] = v;
           }
         }
-        // Notes: import fills blanks only, existing notes are not overwritten
         if (p.notes) {
           for (const [cid, note] of Object.entries(p.notes)) {
             if (!state.notes[cid]) state.notes[cid] = note;
@@ -1845,12 +2806,10 @@ function wireImport() {
           }
         }
         renderAll();
-      } catch (err) {
-        alert("Import failed: " + err.message);
-      }
+      } catch (err) { alert("Import failed: " + err.message); }
     };
     rd.readAsText(f);
-    inp.value = ""; // allow re-import of the same filename
+    inp.value = "";
   };
 }
 
@@ -1888,7 +2847,7 @@ function renderAll() {
   const statusEl = document.getElementById("assert-status");
   if (errs.length) {
     statusEl.textContent = "ASSERTION FAILURE, refusing to render";
-    statusEl.style.color = "#b04e00";
+    statusEl.style.color = "#EF4444";
     console.error("VISTA assertion failure:", errs);
     document.getElementById("main").innerHTML =
       `<section class="panel"><h2>Refusing to render</h2>
@@ -1909,11 +2868,4 @@ function renderAll() {
   renderAll();
 })();
 
-/* --- optional external-load helper stub (unused by default) --------
-async function loadExternal() {
-  const c = await fetch('./criteria.json').then(r => r.json());
-  const p = await fetch('./patterns.json').then(r => r.json());
-  // wire c/p into module-level CRITERIA / PATTERNS if ever needed
-}
-------------------------------------------------------------------- */
 </script>
