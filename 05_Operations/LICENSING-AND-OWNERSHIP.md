@@ -109,7 +109,7 @@ Copyright (c) 2026 Adhit Satish. All rights reserved.
 
 This software and its methodology are proprietary and confidential.
 Unauthorized use, distribution, or reproduction in any form is prohibited.
-Contact: adhitsatish903@gmail.com for licensing inquiries.
+Contact: adhitsatish@gmail.com for licensing inquiries.
 ```
 
 ---

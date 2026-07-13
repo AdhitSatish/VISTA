@@ -32,7 +32,7 @@ cd "C:\Users\YourName\Documents\VISTA"
 git init
 
 # Set your personal identity (use personal email, not work email)
-git config user.email "adhitsatish903@gmail.com"
+git config user.email "adhitsatish@gmail.com"
 git config user.name "Adhit Satish"
 
 # Stage everything
