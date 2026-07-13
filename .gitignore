@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.Python
+*.egg-info/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Obsidian workspace files (not needed in repo)
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/graph.json
+
+# Assessments are gitignored by default to keep client data private
+# Remove the line below if you want to track assessment exports in the repo
+04_Assessments/*.json
+
+# Temp / scratch
+*.tmp
+*.bak
+scratchpad/
