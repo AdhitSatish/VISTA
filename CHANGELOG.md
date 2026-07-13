@@ -1,5 +1,37 @@
 # VISTA Calculator Changelog
 
+## V.02.02.00 -- Input UX + Summary Layout (2026-07-13)
+
+**What changed:** Three UX fixes to eliminate input friction and reduce wasted space in the Summary.
+
+Social media number inputs: All follower count and post metric fields (shares, saves, comments, likes for 10 posts across Instagram, Facebook, and the primary platform) previously re-rendered the page on every keystroke, scrolling the user back to the top mid-entry. All social inputs now use `onchange` (fires on blur or Enter), so the user can type a full number without any interruption.
+
+Year founded field: Previously accepted any text and re-rendered on every character, causing the page to scroll up after each digit. Now digits-only (non-numeric characters are stripped in place without triggering a re-render), and the re-render only fires when the field loses focus. All other metadata fields (brand name, country, sector, assessment date) also switched to `onchange` for the same reason.
+
+Summary layout: The hero score ring and the data grid (radar chart and six dimension stat cards) now sit side by side in a flex row instead of stacking vertically. The hero (300px ring, band label, subtitle) occupies a fixed 380px left column. The data grid fills the remaining width. This removes a full page of vertical scroll and keeps the score reveal and dimension detail visible together. Responsive: stacks to a single column below 1100px.
+
+**Files changed:** index.html (root, serves GitHub Pages), 03_Calculator/index.html (source)
+
+---
+
+## V.02.01.00 -- UX Polish + Bug Fixes (2026-07-13)
+
+**What changed:** Five targeted fixes to the input and navigation experience.
+
+Header legibility: The subtitle text and status indicator were using a near-invisible muted color on the dark background. Both now use a readable mid-gray.
+
+Sidebar rail: Compressed the score ring (200px to 140px) and radar chart (290px to 200px), and tightened padding, so the full rail -- ring, band label, radar, and dimension legend -- fits in one viewport column without scrolling.
+
+Fixed bottom bar: The score and Confirm Section button are now pinned to the bottom of the screen at all times during input, so the user never has to scroll to find it. Clears the rail on the right. Restores to static position for print/PDF.
+
+Auto-advance on confirm: Clicking Confirm Section now automatically moves to the next dimension tab. After the last dimension (Reputation), it advances to the Summary tab.
+
+Bug fix -- sponsorable criteria pre-select: All sponsorable criteria (absent/sponsored/earned inputs) were visually showing "absent" as pre-selected on unanswered questions due to a fallback in the render logic. This gave the false impression that answers had been entered. Fixed: no button is highlighted until the user makes an explicit choice.
+
+**Files changed:** index.html (root, serves GitHub Pages), 03_Calculator/index.html (source)
+
+---
+
 ## V.02.00.00 -- Cinematic Summary Redesign (2026-07-13)
 
 **What changed:** Complete overhaul of the Summary tab and a new version numbering system. The Summary is now a cinematic, full-bleed dashboard experience, not a form with a score tucked to the side.

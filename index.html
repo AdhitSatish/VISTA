@@ -81,12 +81,12 @@ header {
   font-size: 9px;
   letter-spacing: 2.5px;
   text-transform: uppercase;
-  color: var(--fg-muted);
+  color: var(--fg-2);
 }
 .header-status {
   font-size: 11px;
   letter-spacing: 1px;
-  color: var(--fg-muted);
+  color: var(--fg-2);
 }
 
 /* ---- TABS ---- */
@@ -168,7 +168,7 @@ aside.radar-rail {
 .radar-card {
   position: sticky;
   top: calc(var(--header-h) + var(--tab-h));
-  padding: 28px 24px;
+  padding: 16px 20px;
 }
 
 /* ---- TYPOGRAPHY ---- */
@@ -628,12 +628,25 @@ aside.radar-rail {
 
 /* ---- CONFIRM ROW ---- */
 .confirm-row {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 380px;
+  z-index: 50;
+  background: var(--bg);
+  border-top: 1px solid var(--line);
+  padding: 14px 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 36px;
-  padding-top: 24px;
-  border-top: 1px solid var(--line);
+}
+@media print {
+  .confirm-row {
+    position: static;
+    border-top: 1px solid var(--line);
+    padding: 20px 0 0;
+    margin-top: 28px;
+  }
 }
 .live-score { font-size: 28px; font-weight: 700; letter-spacing: -1px; color: var(--fg); font-variant-numeric: tabular-nums; }
 .live-score-of { color: var(--fg-muted); font-size: 13px; font-weight: 400; letter-spacing: 0.5px; margin-left: 6px; }
@@ -677,8 +690,8 @@ button.ghost:hover { border-color: var(--accent-border); color: var(--accent); }
   font-weight: 600;
   margin-bottom: 16px;
 }
-.rail-score-center { display: flex; justify-content: center; margin-bottom: 8px; }
-.rail-band-center { display: flex; justify-content: center; margin-bottom: 20px; }
+.rail-score-center { display: flex; justify-content: center; margin-bottom: 4px; }
+.rail-band-center { display: flex; justify-content: center; margin-bottom: 12px; }
 .band-pill {
   display: inline-block;
   font-size: 9px;
@@ -1382,12 +1395,34 @@ main.summary-view section.panel {
 @media (max-width: 768px) {
   main.summary-view section.panel { padding: 20px 16px 60px; }
 }
+
+/* ---- SUMMARY TOP ROW (hero beside data grid) ---- */
+.summary-top {
+  display: flex;
+  gap: 20px;
+  align-items: start;
+  margin-bottom: 28px;
+}
+.summary-top .summary-hero {
+  flex: 0 0 380px;
+  padding: 40px 28px 36px;
+  margin-bottom: 0;
+}
+.summary-top .summary-data-grid {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+}
+@media (max-width: 1100px) {
+  .summary-top { flex-direction: column; }
+  .summary-top .summary-hero { flex: none; width: 100%; padding: 40px 24px 36px; }
+}
 </style>
 
 <header>
   <div class="header-brand">
     <div class="header-logo"><em>VISTA</em> Calculator</div>
-    <div class="header-sub">Visibility Intelligence &amp; Strategic Trust Assessment &middot; V.02.00.00</div>
+    <div class="header-sub">Visibility Intelligence &amp; Strategic Trust Assessment &middot; V.02.02.00</div>
   </div>
   <div class="header-status" id="assert-status">loading&hellip;</div>
 </header>
@@ -2214,6 +2249,9 @@ function renderDimTab(dim) {
   btn.onclick = () => {
     state.confirmed[dim] = true;
     animateRadarAxis(dim, s === null ? 0 : s);
+    const allTabs = [...RADAR_DIMS, "SUMMARY"];
+    const nextIdx = allTabs.indexOf(dim) + 1;
+    if (nextIdx < allTabs.length) state.activeTab = allTabs[nextIdx];
     renderAll();
   };
   row.appendChild(btn);
@@ -2366,7 +2404,7 @@ function renderInput(c) {
     for (const v of ["absent","sponsored","earned"]) {
       const lab = document.createElement("label"); lab.className = "tri-pill";
       const inp = document.createElement("input"); inp.type = "radio"; inp.name = "tri_" + c.id;
-      inp.checked = (state.answers[c.id] || "absent") === v;
+      inp.checked = state.answers[c.id] === v;
       inp.onchange = () => answer(c.id, v);
       lab.appendChild(inp);
       lab.appendChild(document.createTextNode(" " + v));
@@ -2501,13 +2539,13 @@ function renderSCInputs() {
     const p = document.getElementById("sc_platform");
     if (p) p.onchange = e => { state.social.primary.platform = e.target.value; renderAll(); };
     const ig = document.getElementById("sc_ig");
-    if (ig) ig.oninput = e => { state.social.igFollowers = Number(e.target.value)||0; renderAll(); };
+    if (ig) ig.onchange = e => { state.social.igFollowers = Number(e.target.value)||0; renderAll(); };
     const fb = document.getElementById("sc_fb");
-    if (fb) fb.oninput = e => { state.social.fbFollowers = Number(e.target.value)||0; renderAll(); };
+    if (fb) fb.onchange = e => { state.social.fbFollowers = Number(e.target.value)||0; renderAll(); };
     const pf = document.getElementById("sc_primary_followers");
-    if (pf) pf.oninput = e => { state.social.primary.followers = Number(e.target.value)||0; renderAll(); };
+    if (pf) pf.onchange = e => { state.social.primary.followers = Number(e.target.value)||0; renderAll(); };
     for (const inp of box.querySelectorAll("input[data-post]")) {
-      inp.oninput = e => {
+      inp.onchange = e => {
         const i = Number(e.target.dataset.post);
         const f = e.target.dataset.field;
         state.social.primary.posts[i][f] = Number(e.target.value)||0;
@@ -2656,9 +2694,9 @@ function radarRailHTML() {
   return `
     <div class="radar-card">
       <h4>VISTA Score</h4>
-      <div class="rail-score-center">${scoreRingSVG(comp, 200)}</div>
+      <div class="rail-score-center">${scoreRingSVG(comp, 140)}</div>
       <div class="rail-band-center"><span class="band-pill ${band.cls}">${band.label}</span></div>
-      <div class="radar-center">${renderRadar(290)}</div>
+      <div class="radar-center">${renderRadar(200)}</div>
       <ul class="dim-list">
         ${dims.map(x => {
           const m = DIM_META.find(d => d.key === x.d);
@@ -2765,7 +2803,9 @@ function renderSummary() {
       '<div class="summary-hero-band"><span class="band-pill ' + band.cls + '">' + band.label + '</span></div>' +
       '<div class="summary-hero-subtitle">Visibility Intelligence &amp; Strategic Trust Assessment</div>' +
     '</div>';
-  wrap.appendChild(hero);
+  // TOP ROW: hero left | data grid right
+  const topRow = document.createElement("div"); topRow.className = "summary-top";
+  topRow.appendChild(hero);
 
   // DATA GRID: Radar (left) | Dimension stat cards (right)
   const dataGrid = document.createElement("div"); dataGrid.className = "summary-data-grid";
@@ -2811,7 +2851,8 @@ function renderSummary() {
   unconfNote.textContent = "* Score not yet confirmed. Go to that tab and click Confirm section to lock it in before exporting.";
   dimPanel.appendChild(unconfNote);
   dataGrid.appendChild(dimPanel);
-  wrap.appendChild(dataGrid);
+  topRow.appendChild(dataGrid);
+  wrap.appendChild(topRow);
 
   // Metadata block
   const metaBox = document.createElement("div"); metaBox.className = "sc-inputs"; metaBox.style.marginBottom = "20px";
@@ -2832,7 +2873,8 @@ function renderSummary() {
     if (f.placeholder) inp.placeholder = f.placeholder;
     if (f.maxlength) inp.maxLength = f.maxlength;
     if (f.inputmode) inp.inputMode = f.inputmode;
-    inp.oninput = e => { state.meta[f.key] = e.target.value; renderAll(); };
+    inp.onchange = e => { state.meta[f.key] = e.target.value; renderAll(); };
+    if (f.key === "launchYear") { inp.oninput = e => { e.target.value = e.target.value.replace(/[^0-9]/g, ""); }; }
     l.appendChild(inp); grid.appendChild(l);
   }
   metaBox.appendChild(grid);
@@ -2955,7 +2997,7 @@ function exportJSON() {
   const dims = {};
   for (const d of RADAR_DIMS) dims[d] = { score: dimensionScore(d, state), confirmed: state.confirmed[d] };
   const payload = {
-    schema: "vista-v2.0.0",
+    schema: "vista-v2.2.0",
     buildId: BUILD_ID,
     exportedAt: new Date().toISOString(),
     meta: state.meta,
@@ -3077,7 +3119,7 @@ function renderAll() {
     return;
   }
   statusEl.textContent = "195 criteria · 49/27/38/26/28/27 ✓";
-  console.info("VISTA V.02.00.00. Methodology and instrument authored by Adhit Satish.");
+  console.info("VISTA V.02.02.00. Methodology and instrument authored by Adhit Satish.");
   wireImport();
   window.addEventListener("beforeunload", e => {
     if (progressFor(null).answered > 0) {
