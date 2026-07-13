@@ -1,5 +1,32 @@
 # VISTA Calculator Changelog
 
+## v1.3 -- English Quality Pass (2026-07-13)
+
+**What changed:** English quality fixes across 20 specific criteria, plus a UX improvement to the brand launch year input field in the Summary and Export section.
+
+**Why:** An editorial audit rated the corpus at 83-85%. Three categories prevented it from reaching 90%: metric acronyms left in hint text, inconsistent punctuation in "for example" phrases, and contradictory or ambiguous scoring instructions. All three categories have been resolved.
+
+**Specific fixes:**
+- SV16, SV17, SV18: Removed LCP, INP, and CLS acronyms entirely. Each hint now describes what the metric measures in plain English without naming the metric by its abbreviation.
+- AV16, DE17, DE39, SC21: Fixed "For example:" (capital F, colon) to "for example," (lowercase, comma) to resolve the grammatical inconsistency in embedded examples.
+- AV06: Recast the opening sentence as an instruction rather than an assertion. Added missing comma after "Also".
+- AV10: Replaced "All correct = 5, the main source has significant errors = 1" with "Match to the level below" to make the scoring style consistent with the rest of the calculator.
+- AV20 text field: "FAQ pages have structured data that Google can read" rewritten to "FAQ pages are marked up so that Google can display answers directly in search results". Removes the jargon term "structured data".
+- BA06 evidence: "the article" corrected to "the articles".
+- BA26: Fixed dangling participle. "One major unresolved story dominating the results scores 1" rewritten to "One major unresolved story that dominates the results scores 1".
+- RC07: Rewritten to remove the ambiguous double negative. The scoring logic is now stated as two explicit sentences.
+- RC08: Removed the contradictory instruction. The hint previously contained both a specific score ("Near-silence scores 1") and the general instruction ("Match to the level below"). The specific score has been removed.
+- RC14: Fixed comma splice. "Zero mentions scores 1, regular active threads score 5" rewritten as two separate sentences.
+- RC27: Reordered so the general instruction comes before the exception case, not after it.
+- SC14: Clarified "More than 80% product posts scores 1" which read as if the posts scored 1 rather than the criterion. Now explicit: "A feed that is more than 80% product announcements, with almost no other content, scores 1."
+- SC23: Removed "engagement rate" jargon. Rewritten to describe what the calculator computes in plain terms.
+- SC27 hint and text: Clarified the conditional logic and rewritten the text label to remove "in a way that makes sense today" (too vague).
+- Brand launch year input: Changed from a slow number spinner (type="number") to a plain text field with a placeholder ("e.g. 2018"), a 4-character limit, and a numeric keyboard on mobile. Label updated from "brand launch year" to "year the brand was founded" to remove ambiguity about whether it means the founding year or the age of the brand.
+
+**Files changed:** index.html (root, serves GitHub Pages), 03_Calculator/index.html (source)
+
+---
+
 ## v1.2 -- Plain Language Pass (2026-07-13)
 
 **What changed:** Complete plain language rewrite across all 195 criteria. Three fields were updated on every single criterion: the short title, the instruction text, and the evidence note.
