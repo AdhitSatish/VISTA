@@ -151,7 +151,7 @@ nav.tabs button.active::after { background: var(--accent); }
 /* ---- MAIN LAYOUT ---- */
 main {
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: 1fr 380px;
   min-height: calc(100vh - var(--header-h) - var(--tab-h));
 }
 main.summary-view { grid-template-columns: 1fr; }
@@ -168,7 +168,7 @@ aside.radar-rail {
 .radar-card {
   position: sticky;
   top: calc(var(--header-h) + var(--tab-h));
-  padding: 24px 20px;
+  padding: 28px 24px;
 }
 
 /* ---- TYPOGRAPHY ---- */
@@ -275,9 +275,10 @@ aside.radar-rail {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 14px 16px;
+  padding: 16px 18px;
   background: var(--bg-card);
   border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
   border-radius: var(--r-sm);
   cursor: pointer;
   user-select: none;
@@ -341,10 +342,14 @@ aside.radar-rail {
 .criterion-card {
   background: var(--bg-card);
   border: 1px solid var(--line);
+  border-left: 3px solid transparent;
   border-radius: var(--r);
-  padding: 18px 20px;
-  margin-bottom: 6px;
-  transition: border-color 0.15s;
+  padding: 22px 24px;
+  margin-bottom: 8px;
+  transition: border-color 0.15s, border-left-color 0.2s;
+}
+.criterion-card.answered {
+  border-left-color: var(--accent);
 }
 .criterion-card:hover {
   border-color: var(--line-strong);
@@ -464,15 +469,15 @@ aside.radar-rail {
   margin-bottom: 10px;
 }
 .yn-pill {
-  padding: 6px 18px;
+  padding: 9px 24px;
   border: 1px solid var(--line-strong);
   border-radius: var(--r-pill);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
-  color: var(--fg-muted);
+  color: var(--fg-2);
   background: var(--bg-input);
-  transition: all 0.12s;
+  transition: all 0.15s;
   user-select: none;
   display: inline-flex;
   align-items: center;
@@ -480,8 +485,8 @@ aside.radar-rail {
 }
 .yn-pill input { display: none; }
 .yn-pill:hover { border-color: var(--line-strong); color: var(--fg-2); background: var(--bg-card-2); }
-.yn-pill.sel-yes { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
-.yn-pill.sel-no  { border-color: var(--red); background: rgba(239,68,68,0.08); color: var(--red); }
+.yn-pill.sel-yes { border-color: var(--accent); background: rgba(3,175,151,0.18); color: var(--accent); font-weight: 600; box-shadow: 0 0 0 1px var(--accent) inset; }
+.yn-pill.sel-no  { border-color: var(--red); background: rgba(239,68,68,0.18); color: var(--red); font-weight: 600; box-shadow: 0 0 0 1px var(--red) inset; }
 .yn-pill.sel-na  { border-color: var(--line-strong); background: var(--bg-card-2); color: var(--fg-2); }
 
 /* ---- INPUTS: M ANCHORS (1-5) ---- */
@@ -1173,12 +1178,216 @@ button.ghost:hover { border-color: var(--accent-border); color: var(--accent); }
   section.panel { padding: 0 16px !important; }
 }
 
+
+/* ---- SUMMARY V2 HERO ---- */
+.summary-hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--accent-border);
+  border-radius: 20px;
+  padding: 64px 48px 52px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+.summary-hero-glow {
+  position: absolute;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 500px;
+  background: radial-gradient(ellipse at center, rgba(3,175,151,0.22) 0%, rgba(3,175,151,0.10) 35%, rgba(3,175,151,0.03) 60%, transparent 75%);
+  pointer-events: none;
+  z-index: 0;
+}
+.summary-hero-glow-floor {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 400px;
+  height: 120px;
+  background: radial-gradient(ellipse at center bottom, rgba(3,175,151,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+.summary-hero-content {
+  position: relative;
+  z-index: 1;
+}
+.summary-hero-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 32px;
+  opacity: 0.75;
+}
+.summary-hero-ring {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+  filter: drop-shadow(0 0 40px rgba(3,175,151,0.25));
+}
+.summary-hero-band {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+.summary-hero-band .band-pill {
+  font-size: 10px;
+  letter-spacing: 3px;
+  padding: 6px 20px;
+}
+.summary-hero-subtitle {
+  font-size: 10px;
+  color: var(--fg-muted);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+}
+
+/* ---- SUMMARY V2 DATA GRID ---- */
+.summary-data-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+  margin-bottom: 28px;
+}
+.summary-radar-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 32px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.summary-radar-panel-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 20px;
+  align-self: flex-start;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  width: 100%;
+}
+.summary-dim-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 28px;
+}
+.summary-dim-panel-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.dim-grid-6 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.dim-stat-card {
+  background: var(--bg-card-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 18px 18px 14px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.dim-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: var(--score-col, var(--accent));
+  border-radius: 0;
+}
+.dim-stat-card:hover {
+  border-color: var(--line-strong);
+  transform: translateY(-1px);
+}
+.dim-stat-code {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 4px;
+}
+.dim-stat-score {
+  font-size: 32px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -1.5px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.dim-stat-name {
+  font-size: 10px;
+  color: var(--fg-muted);
+  letter-spacing: 0.3px;
+  margin-bottom: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dim-stat-bar-bg {
+  height: 2px;
+  background: var(--line-strong);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.dim-stat-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.7s cubic-bezier(0.16,1,0.3,1);
+}
+
+/* ---- SUMMARY V2 RESPONSIVE ---- */
+@media (max-width: 960px) {
+  .summary-data-grid { grid-template-columns: 1fr; }
+  .summary-hero { padding: 44px 24px 36px; }
+  .summary-hero-glow { width: 400px; }
+  .dim-grid-6 { grid-template-columns: 1fr 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  .dim-grid-6 { grid-template-columns: 1fr 1fr; }
+  .dim-stat-score { font-size: 24px; }
+}
+
+/* ---- SUMMARY VIEW PANEL TWEAKS ---- */
+main.summary-view section.panel {
+  padding: 40px 52px 100px;
+  max-width: 1360px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+@media (max-width: 1200px) {
+  main.summary-view section.panel { padding: 32px 32px 80px; }
+}
+@media (max-width: 768px) {
+  main.summary-view section.panel { padding: 20px 16px 60px; }
+}
 </style>
 
 <header>
   <div class="header-brand">
     <div class="header-logo"><em>VISTA</em> Calculator</div>
-    <div class="header-sub">Visibility Intelligence &amp; Strategic Trust Assessment &middot; v1</div>
+    <div class="header-sub">Visibility Intelligence &amp; Strategic Trust Assessment &middot; V.02.00.00</div>
   </div>
   <div class="header-status" id="assert-status">loading&hellip;</div>
 </header>
@@ -2018,7 +2227,8 @@ function renderDimTab(dim) {
 function renderCriterion(c) {
   const el = document.createElement("div");
   const na = !isApplicable(c, state.flags);
-  el.className = "criterion-card" + (na ? " na" : "");
+  const isAnswered = state.answers[c.id] !== undefined && state.answers[c.id] !== null && state.answers[c.id] !== "";
+  el.className = "criterion-card" + (na ? " na" : (isAnswered ? " answered" : ""));
   el.dataset.critId = c.id;
 
   const header = document.createElement("div"); header.className = "crit-header";
@@ -2446,9 +2656,9 @@ function radarRailHTML() {
   return `
     <div class="radar-card">
       <h4>VISTA Score</h4>
-      <div class="rail-score-center">${scoreRingSVG(comp, 130)}</div>
+      <div class="rail-score-center">${scoreRingSVG(comp, 200)}</div>
       <div class="rail-band-center"><span class="band-pill ${band.cls}">${band.label}</span></div>
-      <div class="radar-center">${renderRadar(210)}</div>
+      <div class="radar-center">${renderRadar(290)}</div>
       <ul class="dim-list">
         ${dims.map(x => {
           const m = DIM_META.find(d => d.key === x.d);
@@ -2524,11 +2734,12 @@ function renderSubComponentBars() {
 function renderSummary() {
   const wrap = document.createElement("div");
 
-  // Header
-  const head = document.createElement("div"); head.className = "summary-header";
-  const heading = document.createElement("div"); heading.className = "dim-heading";
-  heading.innerHTML = `<span class="dim-code-badge">&#x3A3;</span><span class="dim-title">Summary &amp; Export</span>`;
-  head.appendChild(heading);
+  // Actions bar
+  const actBar = document.createElement("div");
+  actBar.style.cssText = "display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;flex-wrap:wrap;gap:12px;";
+  const actHeading = document.createElement("div");
+  actHeading.style.cssText = "font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--fg-muted);";
+  actHeading.textContent = "Summary & Export";
   const actions = document.createElement("div"); actions.className = "summary-actions";
   const eBtn = document.createElement("button"); eBtn.className = "ghost"; eBtn.textContent = "Export JSON";
   eBtn.onclick = exportJSON;
@@ -2537,17 +2748,75 @@ function renderSummary() {
   const pBtn = document.createElement("button"); pBtn.className = "ghost"; pBtn.textContent = "Print / PDF";
   pBtn.onclick = () => window.print();
   actions.appendChild(eBtn); actions.appendChild(iBtn); actions.appendChild(pBtn);
-  head.appendChild(actions);
-  wrap.appendChild(head);
+  actBar.appendChild(actHeading); actBar.appendChild(actions);
+  wrap.appendChild(actBar);
 
-  const importNote = document.createElement("div"); importNote.className = "import-note";
-  importNote.textContent = "Import a .json file previously exported from this tool to resume or merge an earlier session.";
-  wrap.appendChild(importNote);
+  // HERO: Atmospheric score reveal
+  const comp = composite(state);
+  const band = maturityBand(comp);
+
+  const hero = document.createElement("div"); hero.className = "summary-hero";
+  hero.innerHTML =
+    '<div class="summary-hero-glow"></div>' +
+    '<div class="summary-hero-glow-floor"></div>' +
+    '<div class="summary-hero-content">' +
+      '<div class="summary-hero-label">Composite VISTA Score</div>' +
+      '<div class="summary-hero-ring">' + scoreRingSVG(comp, 300) + '</div>' +
+      '<div class="summary-hero-band"><span class="band-pill ' + band.cls + '">' + band.label + '</span></div>' +
+      '<div class="summary-hero-subtitle">Visibility Intelligence &amp; Strategic Trust Assessment</div>' +
+    '</div>';
+  wrap.appendChild(hero);
+
+  // DATA GRID: Radar (left) | Dimension stat cards (right)
+  const dataGrid = document.createElement("div"); dataGrid.className = "summary-data-grid";
+
+  // Left: Radar chart
+  const radarPanel = document.createElement("div"); radarPanel.className = "summary-radar-panel";
+  const radarPanelLabel = document.createElement("div"); radarPanelLabel.className = "summary-radar-panel-label";
+  radarPanelLabel.textContent = "Dimension Radar";
+  radarPanel.appendChild(radarPanelLabel);
+  const radarDiv = document.createElement("div");
+  radarDiv.innerHTML = renderRadar(480);
+  radarPanel.appendChild(radarDiv);
+  dataGrid.appendChild(radarPanel);
+
+  // Right: 6 dimension stat cards
+  const dimPanel = document.createElement("div"); dimPanel.className = "summary-dim-panel";
+  const dimPanelLabel = document.createElement("div"); dimPanelLabel.className = "summary-dim-panel-label";
+  dimPanelLabel.textContent = "Dimension Scores";
+  dimPanel.appendChild(dimPanelLabel);
+  const dimGrid6 = document.createElement("div"); dimGrid6.className = "dim-grid-6";
+  for (const d of RADAR_DIMS) {
+    const s = dimensionScore(d, state);
+    const conf = state.confirmed[d];
+    const meta = DIM_META.find(x => x.key === d);
+    const valStr = s === null ? "n/a" : s.toFixed(1);
+    const c = s !== null ? scoreColor(s) : "var(--fg-muted)";
+    const pct = s !== null ? Math.min(100, s) : 0;
+    const dimName = meta ? meta.name : d;
+    const card = document.createElement("div"); card.className = "dim-stat-card";
+    card.style.setProperty("--score-col", c);
+    card.innerHTML =
+      '<div class="dim-stat-code">' + d + '</div>' +
+      '<div class="dim-stat-score" style="color:' + c + ';'>' + valStr +
+        (!conf && s !== null ? '<span style="font-size:13px;font-weight:400;color:var(--fg-muted);"> *</span>' : '') +
+      '</div>' +
+      '<div class="dim-stat-name">' + dimName + '</div>' +
+      '<div class="dim-stat-bar-bg"><div class="dim-stat-bar-fill" style="width:' + pct.toFixed(1) + '%;background:' + c + ';"></div></div>';
+    dimGrid6.appendChild(card);
+  }
+  dimPanel.appendChild(dimGrid6);
+  const unconfNote = document.createElement("div");
+  unconfNote.style.cssText = "font-size:10px;color:var(--fg-muted);margin-top:14px;";
+  unconfNote.textContent = "* Score not yet confirmed. Go to that tab and click Confirm section to lock it in before exporting.";
+  dimPanel.appendChild(unconfNote);
+  dataGrid.appendChild(dimPanel);
+  wrap.appendChild(dataGrid);
 
   // Metadata block
-  const metaBox = document.createElement("div"); metaBox.className = "sc-inputs"; metaBox.style.marginTop = "24px";
-  metaBox.innerHTML = `<h3>About this brand</h3>
-    <div class="note">Fill this in before you start. It saves with your results and identifies the report.</div>`;
+  const metaBox = document.createElement("div"); metaBox.className = "sc-inputs"; metaBox.style.marginBottom = "20px";
+  metaBox.innerHTML = '<h3>About this brand</h3>' +
+    '<div class="note">Fill this in before you start. It saves with your results and identifies the report.</div>';
   const grid = document.createElement("div"); grid.className = "meta-grid";
   const fields = [
     { key:"brand", label:"brand name" },
@@ -2571,8 +2840,9 @@ function renderSummary() {
 
   // Applicability flags
   const sectorFlagBox = document.createElement("div"); sectorFlagBox.className = "sc-inputs";
-  sectorFlagBox.innerHTML = `<h3>Which of these apply to this brand?</h3>
-    <div class="note">Tick only what is true for this brand. Questions that don't apply are skipped automatically and won't count against the score.</div>`;
+  sectorFlagBox.style.marginBottom = "28px";
+  sectorFlagBox.innerHTML = '<h3>Which of these apply to this brand?</h3>' +
+    '<div class="note">Tick only what is true for this brand. Questions that do not apply are skipped automatically and will not count against the score.</div>';
   const fGrid = document.createElement("div"); fGrid.className = "flags-grid";
   const errSlot = document.createElement("div");
   for (const [flag, def] of Object.entries(APPLICABILITY_FLAGS)) {
@@ -2583,7 +2853,7 @@ function renderSummary() {
       const applDims = Object.values(buildPointsModel(proposed).dimApplicable).filter(Boolean).length;
       if (applDims < 4) {
         inp.checked = !inp.checked;
-        errSlot.innerHTML = `<div class="flag-error">Cannot disable: this combination would leave only ${applDims} sections active. At least 4 must apply.</div>`;
+        errSlot.innerHTML = '<div class="flag-error">Cannot disable: this combination would leave only ' + applDims + ' sections active. At least 4 must apply.</div>';
         return;
       }
       errSlot.innerHTML = "";
@@ -2591,65 +2861,11 @@ function renderSummary() {
     };
     lab.appendChild(inp);
     const span = document.createElement("span");
-    span.innerHTML = `<strong>${FLAG_DISPLAY[flag]}</strong><br><span class="flag-def">${def}</span>`;
+    span.innerHTML = '<strong>' + FLAG_DISPLAY[flag] + '</strong><br><span class="flag-def">' + def + '</span>';
     lab.appendChild(span); fGrid.appendChild(lab);
   }
   sectorFlagBox.appendChild(fGrid); sectorFlagBox.appendChild(errSlot);
   wrap.appendChild(sectorFlagBox);
-
-  // Score section header
-  const scoreDivider = document.createElement("div"); scoreDivider.className = "section-divider";
-  scoreDivider.textContent = "Scores";
-  wrap.appendChild(scoreDivider);
-
-  // Two-column: ring + radar | dimension cards
-  const comp = composite(state);
-  const band = maturityBand(comp);
-  const scoreGrid = document.createElement("div"); scoreGrid.className = "summary-score-grid";
-
-  // Left: ring + radar
-  const leftCard = document.createElement("div"); leftCard.className = "summary-card";
-  leftCard.innerHTML = `
-    <div style="font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--fg-muted);margin-bottom:12px;">Composite VISTA Score</div>
-    <div class="score-ring-center">${scoreRingSVG(comp, 200)}</div>
-    <div class="score-band-center"><span class="band-pill ${band.cls}">${band.label}</span></div>
-  `;
-  const radarDiv = document.createElement("div");
-  radarDiv.style.cssText = "display:flex;justify-content:center;margin-top:8px;";
-  radarDiv.innerHTML = renderRadar(320);
-  leftCard.appendChild(radarDiv);
-  scoreGrid.appendChild(leftCard);
-
-  // Right: dimension score cards
-  const rightCard = document.createElement("div"); rightCard.className = "summary-card";
-  rightCard.innerHTML = `<div style="font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--fg-muted);margin-bottom:16px;">Dimension Scores</div>`;
-  const dimCards = document.createElement("div"); dimCards.className = "dim-score-cards";
-  for (const d of RADAR_DIMS) {
-    const s = dimensionScore(d, state);
-    const conf = state.confirmed[d];
-    const meta = DIM_META.find(x => x.key === d);
-    const valStr = s === null ? "n/a" : (conf ? s.toFixed(1) : s.toFixed(1) + " *");
-    const col = s !== null ? scoreColor(s) : "var(--fg-muted)";
-    const pct = s !== null ? Math.min(100, s) : 0;
-    const card = document.createElement("div"); card.className = "dim-score-card";
-    card.innerHTML = `
-      <div class="dim-score-card-top">
-        <span class="dim-score-name">${d} &middot; ${meta ? meta.name : d}</span>
-        <span class="dim-score-badge" style="color:${col};">${valStr}</span>
-      </div>
-      <div class="dim-score-bar-bg">
-        <div class="dim-score-bar-fill" style="width:${pct.toFixed(1)}%;background:${col};"></div>
-      </div>
-    `;
-    dimCards.appendChild(card);
-  }
-  rightCard.appendChild(dimCards);
-  const unconfNote = document.createElement("div");
-  unconfNote.style.cssText = "font-size:10px;color:var(--fg-muted);margin-top:12px;";
-  unconfNote.textContent = "* Score not yet confirmed. Go to that tab and click Confirm section to lock it in before exporting.";
-  rightCard.appendChild(unconfNote);
-  scoreGrid.appendChild(rightCard);
-  wrap.appendChild(scoreGrid);
 
   // Sub-component bar chart
   const chartDivider = document.createElement("div"); chartDivider.className = "section-divider";
@@ -2657,7 +2873,7 @@ function renderSummary() {
   wrap.appendChild(chartDivider);
   wrap.appendChild(renderSubComponentBars());
 
-  // Red flags
+  // Warning signals
   const flagsDivider = document.createElement("div"); flagsDivider.className = "section-divider";
   flagsDivider.textContent = "Warning signals";
   wrap.appendChild(flagsDivider);
@@ -2665,20 +2881,19 @@ function renderSummary() {
   const flags = computeFlags(state);
   const flagsSection = document.createElement("div"); flagsSection.className = "flags-section";
   const flagsTitle = document.createElement("div"); flagsTitle.className = "flags-section-title";
-  flagsTitle.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Warning signals <span style="font-weight:400;font-size:10px;color:var(--fg-muted);letter-spacing:0;text-transform:none;">not deducted from score</span>`;
+  flagsTitle.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Warning signals <span style="font-weight:400;font-size:10px;color:var(--fg-muted);letter-spacing:0;text-transform:none;">not deducted from score</span>';
   flagsSection.appendChild(flagsTitle);
   if (!flags.length) {
     const ok = document.createElement("div"); ok.className = "empty-flags";
-    ok.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> All clear. No warning signals detected.`;
+    ok.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> All clear. No warning signals detected.';
     flagsSection.appendChild(ok);
   } else {
     for (const f of flags) {
       const alert = document.createElement("div"); alert.className = "flag-alert critical";
-      alert.innerHTML = `<svg class="flag-icon flag-alert-icon-critical" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        <div>
-          <div class="flag-text">${f.text}</div>
-          ${f.provisional ? '<div class="flag-prov">early result, verify after 5+ assessments</div>' : ""}
-        </div>`;
+      alert.innerHTML = '<svg class="flag-icon flag-alert-icon-critical" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' +
+        '<div><div class="flag-text">' + f.text + '</div>' +
+        (f.provisional ? '<div class="flag-prov">early result, verify after 5+ assessments</div>' : '') +
+        '</div>';
       flagsSection.appendChild(alert);
     }
   }
@@ -2696,7 +2911,7 @@ function renderSummary() {
     wrap.appendChild(focusDivider);
 
     const focusSection = document.createElement("div"); focusSection.className = "focus-section";
-    focusSection.innerHTML = `<div style="font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--fg-muted);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--line);">Lowest-scoring dimensions</div>`;
+    focusSection.innerHTML = '<div style="font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--fg-muted);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--line);">Lowest-scoring dimensions</div>';
     const focusList = document.createElement("ul"); focusList.className = "focus-list";
     const top3 = scored.slice(0, Math.min(3, scored.length));
     for (const { d, s, confirmed } of top3) {
@@ -2704,9 +2919,9 @@ function renderSummary() {
       const prog = progressFor(d);
       const gap = prog.applicable - prog.answered;
       const li = document.createElement("li"); li.className = "focus-item";
-      li.innerHTML = `<span class="focus-dim">${d} &middot; ${meta ? meta.name : d}</span>
-        <span class="focus-score">${s.toFixed(1)}<span class="focus-max"> / 100</span></span>
-        <span class="focus-note">${gap > 0 ? gap + " unanswered" : confirmed ? "complete" : "not confirmed"}</span>`;
+      li.innerHTML = '<span class="focus-dim">' + d + ' &middot; ' + (meta ? meta.name : d) + '</span>' +
+        '<span class="focus-score">' + s.toFixed(1) + '<span class="focus-max"> / 100</span></span>' +
+        '<span class="focus-note">' + (gap > 0 ? gap + " unanswered" : confirmed ? "complete" : "not confirmed") + '</span>';
       focusList.appendChild(li);
     }
     focusSection.appendChild(focusList);
@@ -2716,9 +2931,14 @@ function renderSummary() {
   // Benchmarking stub
   const pctBox = document.createElement("div");
   pctBox.style.cssText = "margin-top:24px;padding:20px 24px;background:var(--bg-card);border:1px solid var(--line);border-radius:var(--r);";
-  pctBox.innerHTML = `<div style="font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--fg-muted);margin-bottom:8px;">How this brand compares</div>
-    <div style="font-size:12px;color:var(--fg-muted);">Available once 5 or more brands in this sector have been assessed.</div>`;
+  pctBox.innerHTML = '<div style="font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--fg-muted);margin-bottom:8px;">How this brand compares</div>' +
+    '<div style="font-size:12px;color:var(--fg-muted);">Available once 5 or more brands in this sector have been assessed.</div>';
   wrap.appendChild(pctBox);
+
+  const importNote = document.createElement("div"); importNote.className = "import-note";
+  importNote.style.marginTop = "16px";
+  importNote.textContent = "Import a .json file previously exported from this tool to resume or merge an earlier session.";
+  wrap.appendChild(importNote);
 
   const authorLine = document.createElement("div");
   authorLine.style.cssText = "margin-top:28px;font-size:11px;color:var(--fg-muted);letter-spacing:0.3px;";
@@ -2735,7 +2955,7 @@ function exportJSON() {
   const dims = {};
   for (const d of RADAR_DIMS) dims[d] = { score: dimensionScore(d, state), confirmed: state.confirmed[d] };
   const payload = {
-    schema: "vista-v1.1",
+    schema: "vista-v2.0.0",
     buildId: BUILD_ID,
     exportedAt: new Date().toISOString(),
     meta: state.meta,
@@ -2857,7 +3077,7 @@ function renderAll() {
     return;
   }
   statusEl.textContent = "195 criteria · 49/27/38/26/28/27 ✓";
-  console.info("VISTA v1.1. Methodology and instrument authored by Adhit Satish.");
+  console.info("VISTA V.02.00.00. Methodology and instrument authored by Adhit Satish.");
   wireImport();
   window.addEventListener("beforeunload", e => {
     if (progressFor(null).answered > 0) {

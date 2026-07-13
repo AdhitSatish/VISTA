@@ -1,5 +1,33 @@
 # VISTA Calculator Changelog
 
+## V.02.00.00 -- Cinematic Summary Redesign (2026-07-13)
+
+**What changed:** Complete overhaul of the Summary tab and a new version numbering system. The Summary is now a cinematic, full-bleed dashboard experience, not a form with a score tucked to the side.
+
+**Why:** The previous design, while functional, looked like a developer had put dark mode on a form. The score ring was buried in a sidebar. The radar chart was undersized. The data, which is the entire point of the tool, was not given the visual weight it deserves. This version makes opening the Summary tab feel like a reveal moment.
+
+**Versioning format introduced:** V.MM.mm.pp -- first block for major/huge changes, second for mid-level, third for minor patches. This is the first major version: V.02.00.00.
+
+**What changed in the Summary:**
+
+Score hero section: The Summary now opens with a full-width dark panel with an atmospheric radial glow behind the score ring. The ring is 300px (up from 200px), centred, with a drop-shadow glow halo. The maturity band label sits directly below the ring. This is the first thing you see when you enter the tab -- the number, not a form.
+
+Radar chart: 480px (up from 320px), given its own full-height card on the left side of the data grid. Labels and polygon are dramatically more readable at this size.
+
+Dimension score cards: Replaced the stacked bar-label layout with six large stat cards in a 2x3 grid. Each card has a 32px score number, a left accent bar colour-coded to the score range, and a thin animated bar. These sit alongside the radar in a two-column layout.
+
+Structure reordered: Hero score reveal first, then data grid (radar + dimension cards), then metadata and flags inputs, then sub-component breakdown, then warning signals and focus areas. The user sees the output before the inputs, not the other way around.
+
+**Input view:** No changes. All dimension tabs and the sidebar radar rail work exactly as before.
+
+**CSS additions:** New classes: .summary-hero, .summary-hero-glow, .summary-hero-glow-floor, .summary-hero-content, .summary-hero-label, .summary-hero-ring, .summary-hero-band, .summary-hero-subtitle, .summary-data-grid, .summary-radar-panel, .summary-radar-panel-label, .summary-dim-panel, .summary-dim-panel-label, .dim-grid-6, .dim-stat-card, .dim-stat-code, .dim-stat-score, .dim-stat-name, .dim-stat-bar-bg, .dim-stat-bar-fill. Summary view panel gets max-width: 1360px centred.
+
+**Version strings updated:** header-sub div, schema key, console.info -- all updated from v1.1 / v1 to V.02.00.00 / vista-v2.0.0.
+
+**Files changed:** index.html (root, serves GitHub Pages), 03_Calculator/index.html (source)
+
+---
+
 ## v1.4 -- Premium Visual Redesign (2026-07-13)
 
 **What changed:** Full visual overhaul from the ground up. Every pixel reconsidered. The application now looks and feels like a high-budget, world-class product.
