@@ -1,0 +1,1916 @@
+<!-- VISTA, Visibility Intelligence & Strategic Trust Assessment. Methodology and instrument authored by Adhit Satish. 2026. -->
+<meta charset="utf-8">
+<meta name="author" content="Adhit Satish">
+<title>VISTA Calculator</title>
+<style>
+  /* =====================================================
+     VISTA CALCULATOR - Dark Theme (Oblivion edition)
+     Palette: deep-black bg / white text / orange accent
+     ===================================================== */
+  :root {
+    --bg:   #060a0d;
+    --bg-1: #0b1218;
+    --bg-2: #101a22;
+    --fg:   #dde4eb;
+    --fg-2: #8aa0b4;
+    --muted:#3d5264;
+    --accent:#e28f26;
+    --accent-dim:rgba(226,143,38,0.10);
+    --accent-border:rgba(226,143,38,0.30);
+    --line: rgba(255,255,255,0.055);
+    --line-strong:rgba(255,255,255,0.11);
+    --gap:  #d9603a;
+    --ok:   #52c178;
+    --r:    10px;
+    --r-sm: 6px;
+    --r-pill:20px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; background: var(--bg); color: var(--fg);
+    font-family: 'Roboto', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 15px; line-height: 1.55;
+  }
+  /* HEADER */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 40px; border-bottom: 1px solid var(--line);
+    background: var(--bg-1);
+  }
+  header h1 { margin: 0; font-weight: 700; font-size: 18px; letter-spacing: 2.5px; text-transform: uppercase; }
+  header .sub { color: var(--muted); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
+  header .status { font-size: 11px; letter-spacing: 1px; color: var(--muted); }
+  /* TABS */
+  nav.tabs {
+    display: flex; gap: 0; padding: 0 32px;
+    border-bottom: 1px solid var(--line);
+    background: var(--bg-1); position: sticky; top: 0; z-index: 10;
+  }
+  nav.tabs button {
+    background: transparent; border: 0; border-bottom: 2px solid transparent;
+    padding: 12px 16px; font-size: 10px; color: var(--muted);
+    letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+    font-family: inherit; transition: color 0.15s;
+  }
+  nav.tabs button:hover { color: var(--fg-2); }
+  nav.tabs button.active { color: var(--accent); border-bottom-color: var(--accent); }
+  nav.tabs button[data-dim].active { color: var(--accent); border-bottom-color: var(--accent); }
+  nav.tabs button .tab-count { display: block; font-size: 9px; letter-spacing: 0.5px; margin-top: 2px; text-transform: none; opacity: 0.6; }
+  /* MAIN LAYOUT - right panel fills full column height */
+  main {
+    display: grid; grid-template-columns: 1fr 300px;
+    min-height: calc(100vh - 50px); gap: 0;
+  }
+  main.summary-view { grid-template-columns: 1fr; }
+  section.panel { min-width: 0; padding: 28px 36px 80px 36px; }
+  aside.radar-rail {
+    background: var(--bg-1); align-self: stretch;
+    border-left: 1px solid var(--line);
+  }
+  .radar-card {
+    position: sticky; top: 50px; padding: 22px;
+    background: transparent; border: none;
+  }
+  /* TYPOGRAPHY */
+  h2 { font-weight: 600; font-size: 15px; margin: 0 0 4px 0; letter-spacing: 2px; text-transform: uppercase; }
+  h2 .dim-code { color: var(--accent); font-weight: 700; margin-right: 10px; }
+  .dim-intro { color: var(--muted); font-size: 12px; margin-bottom: 14px; }
+  /* TYPE LEGEND */
+  .type-legend {
+    display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 11px; color: var(--fg-2);
+    margin-bottom: 22px; padding: 10px 14px;
+    background: var(--bg-2); border-radius: var(--r); border: 1px solid var(--line);
+  }
+  .type-legend .leg-item b { color: var(--fg); }
+  /* SUBCOMPONENT */
+  .subcomp { border-top: 1px solid var(--line); padding: 0 0 8px 0; }
+  .subcomp h3 { margin: 0; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--fg-2); }
+  .subcomp .sc-meta { color: var(--muted); font-size: 12px; margin-bottom: 14px; margin-top: 5px; }
+  .subcomp-header { display: flex; align-items: center; gap: 10px; padding: 16px 0 0 0; cursor: pointer; user-select: none; }
+  .subcomp-header h3 { flex: 1; }
+  .subcomp-toggle { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 13px; padding: 0 2px; transition: transform 0.18s; font-family: inherit; line-height: 1; }
+  .subcomp.collapsed .subcomp-toggle { transform: rotate(-90deg); }
+  .subcomp.collapsed .sc-meta, .subcomp.collapsed .criterion { display: none; }
+  .sc-badge { font-size: 10px; color: var(--muted); background: var(--bg-2); padding: 2px 9px; border-radius: var(--r-pill); white-space: nowrap; border: 1px solid var(--line); }
+  .sc-badge.done { background: rgba(82,193,120,0.10); color: var(--ok); font-weight: 600; border-color: rgba(82,193,120,0.22); }
+  /* CRITERION ROWS */
+  .criterion {
+    display: grid; grid-template-columns: 52px 1fr; gap: 14px;
+    padding: 14px 0; border-bottom: 1px solid var(--line);
+  }
+  .criterion:last-child { border-bottom: 0; }
+  .criterion.na { opacity: 0.32; }
+  .na-badge {
+    display: inline-block; margin-top: 4px; padding: 1px 9px;
+    border: 1px solid var(--line-strong); border-radius: var(--r-pill);
+    font-size: 10px; letter-spacing: 1px; color: var(--muted);
+  }
+  .crit-id { font-size: 11px; letter-spacing: 1px; color: var(--muted); padding-top: 2px; }
+  .crit-id .pat { color: var(--accent); font-weight: 600; }
+  .crit-text { font-size: 14px; color: var(--fg); }
+  .crit-hint { font-size: 12px; color: var(--fg-2); margin-top: 5px; line-height: 1.5; }
+  .crit-ev { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .crit-note-wrap { margin-top: 8px; }
+  .crit-note-btn { background: none; border: 1px solid var(--line); border-radius: var(--r-pill); padding: 3px 12px; font-size: 11px; color: var(--fg-2); cursor: pointer; font-family: inherit; letter-spacing: 0.3px; }
+  .crit-note-btn:hover { border-color: var(--accent-border); color: var(--accent); }
+  .crit-note-area { margin-top: 8px; }
+  .crit-note-ta { width: 100%; max-width: 100%; box-sizing: border-box; background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r-sm); color: var(--fg); font-family: inherit; font-size: 12px; padding: 8px; resize: vertical; min-height: 44px; }
+  .crit-note-ta:focus { border-color: var(--accent-border); outline: none; }
+  .crit-note-ta::placeholder { color: var(--muted); }
+  .crit-input { margin-top: 10px; }
+  .crit-input label { display: inline-flex; align-items: center; gap: 6px; margin-right: 18px; cursor: pointer; font-size: 13px; }
+  .crit-input input { accent-color: var(--accent); }
+  /* M ANCHORS */
+  .m-anchors { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 10px; }
+  .m-anchor {
+    border: 1px solid var(--line); padding: 10px; border-radius: var(--r-sm); font-size: 11px;
+    cursor: pointer; background: var(--bg-2); color: var(--fg-2);
+    display: flex; flex-direction: column; gap: 5px; align-items: flex-start;
+    transition: border-color 0.12s, box-shadow 0.12s, background 0.12s;
+  }
+  .m-anchor:hover { border-color: var(--line-strong); background: var(--bg-1); }
+  .m-anchor.selected {
+    border-color: var(--accent); background: var(--accent-dim);
+    box-shadow: 0 0 0 1px var(--accent-border), 0 0 20px rgba(226,143,38,0.07);
+    color: var(--fg);
+  }
+  .m-anchor .lvl { font-size: 10px; letter-spacing: 1px; color: var(--muted); }
+  .m-anchor.selected .lvl { color: var(--accent); }
+  .m-anchor .anc-text { line-height: 1.35; }
+  .inv-note { font-size: 11px; color: var(--accent); letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 500; }
+  /* TRI (BA sponsorable) */
+  .tri { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tri label {
+    border: 1px solid var(--line); padding: 6px 16px;
+    border-radius: var(--r-pill); cursor: pointer; font-size: 12px; color: var(--muted);
+    transition: border-color 0.1s, background 0.1s, color 0.1s;
+  }
+  .tri input[type=radio] { display: none; }
+  .tri label:has(input:checked) { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+  /* YES / NO / N/A */
+  .yn-tri { display: flex; gap: 8px; flex-wrap: wrap; }
+  .yn-tri label {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 18px; border: 1px solid var(--line);
+    border-radius: var(--r-pill); cursor: pointer; font-size: 12px; font-weight: 500;
+    color: var(--muted); transition: border-color 0.1s, background 0.1s, color 0.1s;
+    user-select: none;
+  }
+  .yn-tri input[type=radio] { display: none; }
+  .yn-tri label.yn-sel-yes { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+  .yn-tri label.yn-sel-no  { border-color: var(--gap); background: rgba(217,96,58,0.10); color: var(--gap); }
+  .yn-tri label.yn-sel-na  { border-color: var(--line-strong); background: var(--bg-2); color: var(--fg-2); }
+  /* CONFIRM ROW */
+  .confirm-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line);
+  }
+  .confirm-row .live-score { font-size: 24px; font-weight: 600; letter-spacing: -0.5px; }
+  .confirm-row .live-score span { color: var(--muted); font-size: 12px; font-weight: 400; letter-spacing: 1px; margin-left: 8px; }
+  button.confirm {
+    background: var(--accent); color: #060a0d; border: 0;
+    padding: 11px 28px; letter-spacing: 2px; text-transform: uppercase; font-size: 11px;
+    cursor: pointer; font-family: inherit; border-radius: var(--r-sm); font-weight: 700;
+    transition: opacity 0.15s;
+  }
+  button.confirm:hover { opacity: 0.82; }
+  button.ghost {
+    background: transparent; color: var(--fg-2);
+    border: 1px solid var(--line-strong); border-radius: var(--r-sm);
+    padding: 10px 18px; letter-spacing: 1.5px; text-transform: uppercase; font-size: 11px;
+    cursor: pointer; font-family: inherit;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  button.ghost:hover { border-color: var(--accent); color: var(--accent); }
+  /* RADAR CARD (inside aside) */
+  .radar-card h4 {
+    margin: 0 0 8px 0; font-size: 10px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--muted); font-weight: 500;
+  }
+  .composite { font-size: 40px; font-weight: 600; letter-spacing: -1px; color: var(--fg); }
+  .composite .of { color: var(--muted); font-size: 18px; font-weight: 400; }
+  .band {
+    display: inline-block; font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--accent); margin-top: 6px; padding: 4px 14px;
+    border: 1px solid var(--accent-border); border-radius: var(--r-pill);
+  }
+  .dim-list { list-style: none; padding: 0; margin: 18px 0 0 0; font-size: 12px; }
+  .dim-list li {
+    display: flex; justify-content: space-between; padding: 7px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .dim-list li.confirmed { color: var(--fg-2); }
+  .dim-list li:not(.confirmed) { color: var(--muted); }
+  .dim-list li .val { font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 600; }
+  /* RED FLAGS */
+  .flags { margin-top: 18px; }
+  .flags h4 { margin: 0 0 8px 0; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+  .flag-chip {
+    display: block; padding: 10px 14px; margin-bottom: 6px; font-size: 12px; color: var(--fg-2);
+    border-left: 2px solid var(--gap); background: rgba(217,96,58,0.07);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  }
+  .flag-chip.provisional::after {
+    content: 'early result, verify after 5+ assessments'; display: block; margin-top: 4px;
+    font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted);
+  }
+  .empty-flags { font-size: 12px; color: var(--muted); font-style: italic; }
+  /* FOCUS AREAS */
+  .focus-box { margin-top: 18px; }
+  .focus-box h4 { margin: 0 0 8px 0; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+  .focus-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+  .focus-list li {
+    display: flex; align-items: baseline; gap: 10px;
+    padding: 8px 12px; border-left: 2px solid var(--accent);
+    background: var(--accent-dim); border-radius: 0 var(--r-sm) var(--r-sm) 0; font-size: 12px;
+  }
+  .focus-dim { flex: 1; }
+  .focus-score { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--accent); }
+  .focus-max { font-weight: 400; color: var(--muted); font-size: 11px; }
+  .focus-note { font-size: 11px; color: var(--muted); white-space: nowrap; }
+  /* META GRID (summary tab brand fields) */
+  .meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 20px; margin: 8px 0 24px 0; }
+  .meta-grid label { display: flex; flex-direction: column; font-size: 11px; color: var(--muted); letter-spacing: 0.5px; }
+  .meta-grid input, .meta-grid select {
+    margin-top: 6px; padding: 10px 12px;
+    border: 1px solid var(--line-strong); border-radius: var(--r-sm);
+    font-family: inherit; font-size: 14px; color: var(--fg); background: var(--bg-2);
+  }
+  /* SECTION CARDS (sc-inputs) */
+  .sc-inputs {
+    border: 1px solid var(--line); border-left: 2px solid var(--accent);
+    padding: 18px; margin-bottom: 22px;
+    background: var(--bg-1); border-radius: 0 var(--r) var(--r) 0;
+  }
+  .sc-inputs h3 { margin: 0 0 4px 0; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--fg-2); }
+  .sc-inputs .note { color: var(--muted); font-size: 12px; margin-bottom: 14px; }
+  /* SECTOR FLAGS GRID */
+  .flags-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 22px; }
+  .flags-grid label { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; cursor: pointer; }
+  .flags-grid .flag-def { color: var(--fg-2); font-size: 12px; margin-top: 2px; }
+  .flag-error { color: var(--gap); font-size: 12px; margin-top: 8px; }
+  /* SC SOCIAL INPUTS */
+  .platform-row {
+    display: grid; grid-template-columns: 130px repeat(6, 1fr); gap: 10px; align-items: center;
+    padding: 6px 0; font-size: 12px;
+  }
+  .platform-row.header { color: var(--muted); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
+  .platform-row input {
+    padding: 6px 8px; border: 1px solid var(--line-strong); border-radius: var(--r-sm);
+    font-family: inherit; font-size: 13px; background: var(--bg-2); color: var(--fg); width: 100%;
+  }
+  .er-readout {
+    margin-top: 14px; padding: 12px 16px;
+    background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r);
+    display: flex; gap: 30px; font-variant-numeric: tabular-nums;
+  }
+  .er-readout .label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+  .er-readout .val { font-size: 18px; font-weight: 500; color: var(--accent); }
+  /* SUMMARY HEADER */
+  .summary-header { display: flex; justify-content: space-between; align-items: end; margin-bottom: 24px; flex-wrap: wrap; gap: 8px; }
+  .summary-header .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .import-note { font-size: 11px; color: var(--muted); margin-top: 4px; text-align: right; width: 100%; }
+  /* AV PROTOCOL DEFS */
+  .av-defs { margin: 8px 0 14px 0; padding: 0; display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; font-size: 12px; }
+  .av-defs dt { font-weight: 600; color: var(--fg-2); white-space: nowrap; padding-top: 1px; }
+  .av-defs dd { margin: 0; color: var(--muted); }
+  /* BIG RADAR (summary page) */
+  .big-radar { display: flex; justify-content: center; margin: 20px 0 40px 0; }
+  .summary-score-card {
+    background: var(--bg-1); border: 1px solid var(--line); border-radius: var(--r);
+    padding: 28px; margin-bottom: 24px;
+  }
+  .summary-score-card .dim-list li .val { color: var(--accent); font-weight: 600; }
+  /* MATURITY BANDS */
+  .band-invisible  { color: var(--accent); }
+  .band-emerging   { color: var(--accent); }
+  .band-developing { color: var(--accent); }
+  .band-established{ color: #52c178; }
+  .band-leading    { color: #2ecc71; }
+  /* FOOTER */
+  .footer-note {
+    padding: 20px 40px; color: var(--muted); font-size: 10px; letter-spacing: 1px;
+    border-top: 1px solid var(--line); text-align: center; background: var(--bg-1);
+    text-transform: uppercase;
+  }
+  #importFile { display: none; }
+  /* STICKY PROGRESS BAR */
+  .dim-sticky { position: sticky; top: 50px; z-index: 4; background: var(--bg); border-bottom: 1px solid var(--line); padding: 8px 0 10px 0; margin-bottom: 22px; }
+  .dim-sticky-inner { display: flex; align-items: center; gap: 14px; }
+  .dim-sticky-inner .dl { font-size: 10px; color: var(--muted); white-space: nowrap; text-transform: uppercase; letter-spacing: 1px; }
+  .dim-sticky-inner .dbar { flex: 1; height: 3px; background: var(--bg-2); border-radius: 2px; overflow: hidden; }
+  .dim-sticky-inner .dbar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s ease; box-shadow: 0 0 10px rgba(226,143,38,0.6); }
+  .dim-sticky-inner .dc { font-size: 12px; font-weight: 500; white-space: nowrap; color: var(--fg-2); }
+  .dim-sticky-inner .dt { font-size: 11px; color: var(--muted); padding-left: 10px; border-left: 1px solid var(--line); white-space: nowrap; }
+  /* DRAFT TOAST */
+  .draft-toast {
+    position: fixed; bottom: 28px; right: 28px; z-index: 200;
+    background: var(--bg-2); color: var(--fg);
+    border: 1px solid var(--line-strong); border-radius: var(--r);
+    padding: 14px 20px; display: flex; align-items: center; gap: 16px; font-size: 13px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.7); animation: toast-in 0.2s ease;
+  }
+  @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .draft-toast .dt-save { background: var(--accent); color: #060a0d; border: none; padding: 7px 14px; cursor: pointer; font-family: inherit; font-size: 12px; letter-spacing: 0.5px; border-radius: var(--r-sm); font-weight: 700; }
+  .draft-toast .dt-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 20px; line-height: 1; padding: 0 4px; font-family: inherit; }
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr; }
+    aside.radar-rail { align-self: auto; border-left: none; border-top: 1px solid var(--line); }
+    .meta-grid { grid-template-columns: 1fr 1fr; }
+    .platform-row { grid-template-columns: 1fr; }
+    .m-anchors { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    nav.tabs { padding: 0 12px; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+    nav.tabs button { padding: 12px 10px; font-size: 10px; white-space: nowrap; }
+    section.panel { padding: 20px 16px 60px 16px; }
+    header { padding: 12px 16px; }
+    .summary-header { flex-direction: column; align-items: flex-start; }
+    .summary-header .actions { width: 100%; }
+    .flags-grid { grid-template-columns: 1fr; }
+  }
+  /* PRINT */
+  @media print {
+    header, nav.tabs, .dim-sticky, .confirm-row, .draft-toast, .actions, .import-note, .focus-box, .type-legend, .av-defs { display: none !important; }
+    body { background: #fff !important; color: #111 !important; }
+    aside.radar-rail { background: #fff !important; border: none !important; }
+    .radar-card { background: #fff !important; border: 1px solid #ddd !important; page-break-inside: avoid; }
+    .radar-card h4, .dim-list li { color: #333 !important; }
+    .band { border-color: #e28f26 !important; color: #e28f26 !important; }
+    .dim-list li .val { color: #e28f26 !important; }
+    main { display: block !important; background: #fff !important; }
+    section.panel { padding: 0 16px !important; border: none !important; }
+    .subcomp { page-break-inside: avoid; }
+    .crit-text { color: #111 !important; }
+    .crit-hint { color: #555 !important; }
+    .crit-id { color: #888 !important; }
+    .yn-tri label { padding: 3px 10px; font-size: 11px; border-color: #ddd; color: #999; background: #fff; border-radius: 12px; }
+    .yn-tri label.yn-sel-yes { border-color: #e28f26; color: #e28f26; background: #fff8ec; }
+    .yn-tri label.yn-sel-no  { border-color: #d9603a; color: #d9603a; background: #fdf0eb; }
+    .yn-tri label.yn-sel-na  { border-color: #aaa; color: #777; background: #f5f5f5; }
+    .m-anchor { border-color: #ddd !important; background: #f9f9f9 !important; box-shadow: none !important; color: #333 !important; }
+    .m-anchor.selected { border-color: #e28f26 !important; background: #fff8ec !important; }
+    .sc-inputs { background: #f9f9f9 !important; border-color: #e28f26 !important; border-radius: 0 !important; }
+    .sc-inputs h3 { color: #555 !important; }
+    .focus-list li { background: #fff8ec !important; }
+    .flag-chip { background: #fdf0eb !important; }
+  }
+</style>
+
+<header>
+  <div>
+    <h1><span style="color:var(--accent)">VISTA</span> Calculator</h1>
+    <div class="sub">Visibility Intelligence &amp; Strategic Trust Assessment · v1</div>
+  </div>
+  <div class="sub" id="assert-status">loading…</div>
+</header>
+
+<nav class="tabs" id="tabs"></nav>
+
+<main id="main">
+  <section class="panel" id="panel"></section>
+  <aside class="radar-rail" id="rail"></aside>
+</main>
+
+<div class="footer-note">
+  Works offline · no internet needed · 195 criteria · your answers never leave this file
+</div>
+
+<input type="file" id="importFile" accept="application/json">
+
+<script>
+"use strict";
+
+/* ============================================================
+   VISTA, inlined data
+   Primary load path is inline literal (file:// blocks fetch).
+   ============================================================ */
+
+// ---- 6 M-patterns + 2 bespoke scales + formal -inv rule ----
+// -inv reverses the base pattern's semantic level order so that
+// 5 = good/desirable state, 1 = deficient state (zero-anchored).
+// Scoring math unchanged: pts = ((score-1)/4) * criterion_pts.
+const PATTERNS = {
+  A: { name: "Reach/Presence spread",
+       levels: { 1: "absent everywhere", 2: "one", 3: "some", 4: "most", 5: "all" } },
+  B: { name: "Favorability",
+       levels: { 1: "only appears negative/caveated", 2: "mostly caveated", 3: "neutral",
+                 4: "mostly favorable", 5: "consistently favorable" } },
+  C: { name: "Earned vs supplied",
+       levels: { 1: "entirely supplied/paid/stock", 2: "mostly supplied", 3: "mixed",
+                 4: "mostly earned/original", 5: "entirely earned/original" } },
+  D: { name: "Coverage completeness",
+       levels: { 1: "none of set", 2: "~quarter", 3: "~half", 4: "most", 5: "all" } },
+  E: { name: "Consistency",
+       levels: { 1: "no consistency / absent", 2: "erratic", 3: "loosely consistent",
+                 4: "mostly consistent, minor lapses", 5: "fully consistent" } },
+  F: { name: "Positioning fit",
+       levels: { 1: "contradicts positioning", 2: "below tier", 3: "adequate/generic",
+                 4: "matches tier", 5: "embodies + elevates tier" } },
+  "bespoke-DE18": { name: "Form friction",
+       levels: { 1: "no form or broken", 2: "many fields, unclear purpose", 3: "adequate form",
+                 4: "streamlined with minor friction", 5: "minimal fields, clear purpose" } },
+  "bespoke-DE23": { name: "Awareness→action path",
+       levels: { 1: "only 'register interest and wait', no self-guided path",
+                 2: "can browse models, no clear next step",
+                 3: "can browse + contact, journey not signposted",
+                 4: "clear path (browse→compare→book), minor gaps",
+                 5: "fully guided journey, every stage signposted" } },
+  "bespoke-RC8": { name: "Advocacy vs silence",
+       levels: { 1: "near silence, scored neutral-default, FLAG as gap not strength",
+                 2: "sparse mentions, no genuine advocacy",
+                 3: "some discussion, mostly transactional",
+                 4: "visible advocacy from real users",
+                 5: "active self-sustaining positive community" } }
+};
+
+// Inline anchor overrides for criteria that supply their own scale.
+// Used when the base pattern's generic anchors need a criterion-specific
+// reading. Keyed by criterion id.
+const INLINE_ANCHORS = {
+  // (none needed after user resolution, -inv rule + bespoke ids cover it)
+};
+
+// ---- 195 criteria (BA09 deleted; 5 confirmed duplicates removed) ----
+// Field shape: id, dimension, subComponent, subComponentPoints,
+// criteriaInSubComponent, text, tag, pattern, inverted, sponsorable, evidence.
+const CRITERIA = [
+  // ========== SV, Search Visibility (52) ==========
+  // SC1.1 Brand keyword performance (15pts, 7 criteria)
+  { id:"SV01", dimension:"SV", subComponent:"SC1.1 Brand keyword performance", subComponentPoints:15, criteriaInSubComponent:7, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Google the brand name. Is the brand's own website the first non-ad result?", text:"brand name query returns owned site pos 1", evidence:"SERP screenshot + date" },
+  { id:"SV02", dimension:"SV", subComponent:"SC1.1 Brand keyword performance", subComponentPoints:15, criteriaInSubComponent:7, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Google the brand name. Does a knowledge panel (the info box with logo, address, links) appear beside the results?", text:"brand query returns knowledge panel", evidence:"SERP screenshot" },
+  { id:"SV03", dimension:"SV", subComponent:"SC1.1 Brand keyword performance", subComponentPoints:15, criteriaInSubComponent:7, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Google the brand name. In the first five results, tick the social profiles you see.", text:"brand query returns owned socials in top 5", evidence:"SERP screenshot", checklist:["Instagram","Facebook","LinkedIn","YouTube","TikTok","X / Twitter","Pinterest"] },
+  { id:"SV04", dimension:"SV", subComponent:"SC1.1 Brand keyword performance", subComponentPoints:15, criteriaInSubComponent:7, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Google the brand name plus the country (e.g. 'BrandX Sri Lanka'). Is a page from the brand's own site on page 1?", text:"brand + country query returns owned page pg1", evidence:"SERP" },
+  { id:"SV05", dimension:"SV", subComponent:"SC1.1 Brand keyword performance", subComponentPoints:15, criteriaInSubComponent:7, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Google each model name (e.g. 'BrandX Model Y'). Does the brand's own page for that model show on page 1, for every model?", text:"each model name query returns owned page pg1", evidence:"SERP per model" },
+  { id:"SV06", dimension:"SV", subComponent:"SC1.1 Brand keyword performance", subComponentPoints:15, criteriaInSubComponent:7, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Google the brand name. Do any third-party sites (dealers, news, marketplaces) appear ABOVE the brand's own site? Tick yes only if nothing outranks it.", text:"no 3rd party outranks brand for own brand name", evidence:"SERP" },
+  { id:"SV07", dimension:"SV", subComponent:"SC1.1 Brand keyword performance", subComponentPoints:15, criteriaInSubComponent:7, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Type the brand name into Google slowly and read the autocomplete suggestions. Are they free of negatives like 'scam', 'problems', 'complaints'?", text:"no negative autocomplete on brand query", evidence:"autocomplete screenshot" },
+  // SC1.2 Non-brand category keyword (25pts, 8 criteria)
+  { id:"SV08", dimension:"SV", subComponent:"SC1.2 Non-brand category keyword", subComponentPoints:25, criteriaInSubComponent:8, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Google the main category phrase (e.g. 'luxury SUV Sri Lanka'). Does the brand's site appear anywhere on page 1?", text:"pg1 for primary category term", evidence:"SERP + query logged" },
+  { id:"SV09", dimension:"SV", subComponent:"SC1.2 Non-brand category keyword", subComponentPoints:25, criteriaInSubComponent:8, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Google a second category phrase (e.g. 'premium electric SUV [country]'). Is the brand's site on page 1?", text:"pg1 for secondary category term", evidence:"SERP" },
+  { id:"SV10", dimension:"SV", subComponent:"SC1.2 Non-brand category keyword", subComponentPoints:25, criteriaInSubComponent:8, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Search the brand's primary product-attribute category term (fuel type for automotive, form factor for electronics, tier for phones). Does the brand appear on page 1?", text:"pg1 for primary product-attribute term (fuel type / form factor / tier per sector)", evidence:"SERP" },
+  { id:"SV11", dimension:"SV", subComponent:"SC1.2 Non-brand category keyword", subComponentPoints:25, criteriaInSubComponent:8, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Google a price-bracket phrase (e.g. 'SUV under 30 million LKR'). Is the brand's site on page 1?", text:"pg1 for price-bracket term", evidence:"SERP" },
+  { id:"SV12", dimension:"SV", subComponent:"SC1.2 Non-brand category keyword", subComponentPoints:25, criteriaInSubComponent:8, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Google a use-case phrase (e.g. 'best family SUV for long trips [country]'). Is the brand's site on page 1?", text:"pg1 for use-case term", evidence:"SERP" },
+  { id:"SV13", dimension:"SV", subComponent:"SC1.2 Non-brand category keyword", subComponentPoints:25, criteriaInSubComponent:8, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Google '[category leader] alternative [country]'. Does the brand's site show on page 1?", text:"pg1 for a comparison term (X alternative)", evidence:"SERP" },
+  { id:"SV14", dimension:"SV", subComponent:"SC1.2 Non-brand category keyword", subComponentPoints:25, criteriaInSubComponent:8, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Across all category phrases you tested, did the brand land in the TOP THREE results for at least one?", text:"top 3 for any category term", evidence:"SERP" },
+  { id:"SV15", dimension:"SV", subComponent:"SC1.2 Non-brand category keyword", subComponentPoints:25, criteriaInSubComponent:8, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Look above the normal results on each category search. Does the brand's site own the highlighted answer box (featured snippet) for any of them?", text:"owns any category featured snippet", evidence:"SERP" },
+  // SC1.3 Technical SEO (15pts, 15 criteria)
+  { id:"SV16", dimension:"SV", subComponent:"SC1.3 Technical SEO", subComponentPoints:15, criteriaInSubComponent:13, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Open pagespeed.web.dev, paste the homepage URL, run the test. Under the mobile tab, is LCP 2.5 seconds or less?", text:"LCP ≤ 2.5s (PageSpeed)", evidence:"PSI result + date" },
+  { id:"SV17", dimension:"SV", subComponent:"SC1.3 Technical SEO", subComponentPoints:15, criteriaInSubComponent:13, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"On the same PageSpeed result, find INP. Is it 200 ms or less?", text:"INP ≤ 200ms or good responsiveness", evidence:"PSI" },
+  { id:"SV18", dimension:"SV", subComponent:"SC1.3 Technical SEO", subComponentPoints:15, criteriaInSubComponent:13, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"On the same PageSpeed result, find CLS. Is it 0.10 or less?", text:"CLS ≤ 0.1", evidence:"PSI" },
+  { id:"SV20", dimension:"SV", subComponent:"SC1.3 Technical SEO", subComponentPoints:15, criteriaInSubComponent:13, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Google 'site:brand-domain.com'​‍​‌. Do the homepage, every model page, and the other key pages all appear in the results?", text:"all primary pages indexed (site: search)", evidence:"site: result" },
+  { id:"SV21", dimension:"SV", subComponent:"SC1.3 Technical SEO", subComponentPoints:15, criteriaInSubComponent:13, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Right-click the homepage, View Page Source, find the <title> tag. Is it a unique, descriptive title under 60 characters?", text:"homepage title unique < 60 char", evidence:"view source" },
+  { id:"SV22", dimension:"SV", subComponent:"SC1.3 Technical SEO", subComponentPoints:15, criteriaInSubComponent:13, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"In the same page source, search for the meta description tag. Is one present, with content under 160 characters?", text:"homepage meta description present < 160 char", evidence:"view source" },
+  { id:"SV23", dimension:"SV", subComponent:"SC1.3 Technical SEO", subComponentPoints:15, criteriaInSubComponent:13, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Open validator.schema.org, paste the homepage URL. Does an Organization block appear in the detected items?", text:"valid Organization schema on homepage", evidence:"schema validator" },
+  { id:"SV24", dimension:"SV", subComponent:"SC1.3 Technical SEO", subComponentPoints:15, criteriaInSubComponent:13, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Open validator.schema.org, paste a product or model page URL. Does a Product block appear?", text:"valid Product schema on product pages", evidence:"validator" },
+
+  { id:"SV26", dimension:"SV", subComponent:"SC1.3 Technical SEO", subComponentPoints:15, criteriaInSubComponent:13, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Type brand-domain.com/sitemap.xml into the address bar. Does an XML file load instead of an error page?", text:"XML sitemap at /sitemap.xml", evidence:"url loads" },
+  { id:"SV27", dimension:"SV", subComponent:"SC1.3 Technical SEO", subComponentPoints:15, criteriaInSubComponent:13, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Type brand-domain.com/robots.txt into the address bar. Does a plain text file load?", text:"robots.txt present + valid", evidence:"url loads" },
+  { id:"SV28", dimension:"SV", subComponent:"SC1.3 Technical SEO", subComponentPoints:15, criteriaInSubComponent:13, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Type the site address starting with http:// (no s). Does the browser automatically land on the https:// version with a padlock?", text:"HTTPS enforced sitewide", evidence:"browser check" },
+  { id:"SV29", dimension:"SV", subComponent:"SC1.3 Technical SEO", subComponentPoints:15, criteriaInSubComponent:13, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"View page source on the homepage and two key pages, search for rel=canonical. Is the tag present on each?", text:"canonical tags on primary pages", evidence:"view source" },
+  { id:"SV30", dimension:"SV", subComponent:"SC1.3 Technical SEO", subComponentPoints:15, criteriaInSubComponent:13, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Click every link in the main menu, one by one. Does every one land on a real page, with no 404s and no broken images?", text:"no 404 in primary nav + no broken assets", evidence:"click-through notes" },
+  // SC1.4 Local SEO / GBP (15pts, 9 criteria)
+  { id:"SV31", dimension:"SV", subComponent:"SC1.4 Local SEO / GBP", subComponentPoints:15, criteriaInSubComponent:9, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Search the brand's location name in Google Maps. Does a business profile pin exist for it?", text:"GBP exists for primary location", evidence:"maps screenshot" },
+  { id:"SV32", dimension:"SV", subComponent:"SC1.4 Local SEO / GBP", subComponentPoints:15, criteriaInSubComponent:9, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"On the Google Business Profile, read the category line under the business name. Is it the correct specific category (e.g. 'Car dealer', 'Electronics store', 'Restaurant'), not something vague like 'Business' or 'Establishment'?", text:"GBP correct primary category (#1 local factor)", evidence:"GBP screenshot" },
+  { id:"SV33", dimension:"SV", subComponent:"SC1.4 Local SEO / GBP", subComponentPoints:15, criteriaInSubComponent:9, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"On the profile, open the hours section. Are opening hours listed for every day of the week?", text:"GBP complete hours", evidence:"GBP" },
+  { id:"SV34", dimension:"SV", subComponent:"SC1.4 Local SEO / GBP", subComponentPoints:15, criteriaInSubComponent:9, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"On the profile, open Photos and count. Are there at least 10?", text:"GBP 10+ photos", evidence:"GBP" },
+  { id:"SV35", dimension:"SV", subComponent:"SC1.4 Local SEO / GBP", subComponentPoints:15, criteriaInSubComponent:9, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"On the profile, look at the number next to the stars. Are there 20 or more reviews?", text:"GBP 20+ reviews", evidence:"GBP (10+=lift, 200+=top3)" },
+  { id:"SV36", dimension:"SV", subComponent:"SC1.4 Local SEO / GBP", subComponentPoints:15, criteriaInSubComponent:9, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"On the profile, look at the star rating itself. Is it 4.0 or above?", text:"GBP avg rating 4.0+", evidence:"GBP" },
+  { id:"SV37", dimension:"SV", subComponent:"SC1.4 Local SEO / GBP", subComponentPoints:15, criteriaInSubComponent:9, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"On the profile, scroll to Updates or Posts. Is there anything posted within the last 30 days?", text:"GBP posts/updates in last 30 days", evidence:"GBP" },
+  { id:"SV38", dimension:"SV", subComponent:"SC1.4 Local SEO / GBP", subComponentPoints:15, criteriaInSubComponent:9, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Google the brand's main category and city (e.g. 'electronics store [city]', 'car dealer [city]'). Does the brand appear in the map pack (the map plus three businesses) at the top?", text:"appears in local pack for category + location query", evidence:"SERP" },
+  { id:"SV39", dimension:"SV", subComponent:"SC1.4 Local SEO / GBP", subComponentPoints:15, criteriaInSubComponent:9, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Compare the business name, address, and phone number across the website footer, the Google profile, and Facebook. Do all three match exactly?", text:"NAP consistent across web", evidence:"3-source check" },
+  // SC1.5 Domain architecture (10pts, 4 criteria)
+  { id:"SV40", dimension:"SV", subComponent:"SC1.5 Domain architecture", subComponentPoints:10, criteriaInSubComponent:3, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Check the address bar. Is the site on its own domain (e.g. brandx.lk or brandx.com), not a subfolder of a parent company (parent.com/brandx) and not a subdomain of another site (brandx.parentco.lk)?", text:"brand has its own standalone domain (.lk or .com), not hosted as a subdirectory or subdomain of another company's site", evidence:"url" },
+  { id:"SV42", dimension:"SV", subComponent:"SC1.5 Domain architecture", subComponentPoints:10, criteriaInSubComponent:3, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Read the address bar on a few inner pages. Are the URLs short readable words (/models/atto-3), not code strings (?id=83792)?", text:"URL structure clean and readable", evidence:"url examples" },
+  { id:"SV43", dimension:"SV", subComponent:"SC1.5 Domain architecture", subComponentPoints:10, criteriaInSubComponent:3, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Click each model on the site. Does each one open its own page with its own address you could copy and send to someone?", text:"each model has its own indexable URL", evidence:"urls" },
+  // SC1.6 SERP features (10pts, 5 criteria)
+  { id:"SV44", dimension:"SV", subComponent:"SC1.6 SERP features", subComponentPoints:10, criteriaInSubComponent:5, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"For any of your test searches, does the brand's site own the highlighted answer box at the very top of Google?", text:"owns a featured snippet for any relevant query", evidence:"SERP" },
+  { id:"SV45", dimension:"SV", subComponent:"SC1.6 SERP features", subComponentPoints:10, criteriaInSubComponent:5, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"On your test searches, expand the 'People also ask' questions. Does the brand's site supply the answer to any of them?", text:"appears in People Also Ask", evidence:"SERP" },
+  { id:"SV46", dimension:"SV", subComponent:"SC1.6 SERP features", subComponentPoints:10, criteriaInSubComponent:5, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Google the brand name and switch to the Images tab. Are brand-owned photos (from the site or socials) in the first rows?", text:"appears in image pack for brand query", evidence:"SERP" },
+  { id:"SV47", dimension:"SV", subComponent:"SC1.6 SERP features", subComponentPoints:10, criteriaInSubComponent:5, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Google the brand or a model name and switch to the Videos tab. Do the brand's own videos show up?", text:"appears in video results for brand/model", evidence:"SERP" },
+  { id:"SV48", dimension:"SV", subComponent:"SC1.6 SERP features", subComponentPoints:10, criteriaInSubComponent:5, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Google the brand name. Under the main result, are there indented shortcut links to inner pages (sitelinks)?", text:"has sitelinks under brand query", evidence:"SERP" },
+  // SC1.7 Indexed surface area (10pts, 4 criteria)
+  { id:"SV49", dimension:"SV", subComponent:"SC1.7 Indexed surface area", subComponentPoints:10, criteriaInSubComponent:4, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Google 'site:brand-domain.com' and count the results. Are there at least 10 pages indexed?", text:"10+ pages indexed", evidence:"site: count" },
+  { id:"SV50", dimension:"SV", subComponent:"SC1.7 Indexed surface area", subComponentPoints:10, criteriaInSubComponent:4, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"In those site: results, does every product or model have its own page?", text:"page per product/model", evidence:"urls" },
+  { id:"SV51", dimension:"SV", subComponent:"SC1.7 Indexed surface area", subComponentPoints:10, criteriaInSubComponent:4, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"In those site: results, are there non-product pages too (about, ownership, service)?", text:"non-product pages exist (about/ownership/service)", evidence:"urls" },
+  { id:"SV52", dimension:"SV", subComponent:"SC1.7 Indexed surface area", subComponentPoints:10, criteriaInSubComponent:4, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"In those site: results, is there any blog, news, or editorial page published by the brand?", text:"any blog/editorial content indexed", evidence:"url" },
+
+  // ========== AV, AI Visibility (27) ==========
+  // SC2.1 GEO brand mention (25pts, 6)
+  { id:"AV01", dimension:"AV", subComponent:"SC2.1 GEO brand mention in AI answers", subComponentPoints:25, criteriaInSubComponent:6, tag:"M", pattern:"A", inverted:false, sponsorable:false, hint:"Ask ChatGPT, Perplexity, Gemini, and Claude the primary category prompt ('best luxury SUV in [country]'). In how many of the four answers is the brand named? Match the count to the level.", text:"appears for primary category prompt (denom = 4 engines)", evidence:"4 screenshots" },
+  { id:"AV02", dimension:"AV", subComponent:"SC2.1 GEO brand mention in AI answers", subComponentPoints:25, criteriaInSubComponent:6, tag:"M", pattern:"A", inverted:false, sponsorable:false, hint:"Ask all four engines the product-attribute prompt (e.g. hybrid/EV category). In how many of the four answers is the brand named?", text:"appears for fuel-type category prompt (denom = 4 engines)", evidence:"screenshots" },
+  { id:"AV03", dimension:"AV", subComponent:"SC2.1 GEO brand mention in AI answers", subComponentPoints:25, criteriaInSubComponent:6, tag:"M", pattern:"A", inverted:false, sponsorable:false, hint:"Ask all four engines the use-case prompt ('best luxury family SUV [country]'). In how many answers is the brand named?", text:"appears for use-case prompt (denom = 4 engines)", evidence:"screenshots" },
+  { id:"AV04", dimension:"AV", subComponent:"SC2.1 GEO brand mention in AI answers", subComponentPoints:25, criteriaInSubComponent:6, tag:"M", pattern:"A", inverted:false, sponsorable:false, hint:"Ask all four engines the price-bracket prompt. In how many answers is the brand named?", text:"appears for price-bracket prompt (denom = 4 engines)", evidence:"screenshots" },
+  { id:"AV05", dimension:"AV", subComponent:"SC2.1 GEO brand mention in AI answers", subComponentPoints:25, criteriaInSubComponent:6, tag:"M", pattern:"B", inverted:false, sponsorable:false, hint:"Reread every AI answer that names the brand. Is the wording positive ('a strong option') or hedged ('but resale is unproven')? Match the overall tone to the level.", text:"when appears, mention favorable (sample = all appearances)", evidence:"screenshots" },
+  { id:"AV06", dimension:"AV", subComponent:"SC2.1 GEO brand mention in AI answers", subComponentPoints:25, criteriaInSubComponent:6, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"In the category prompts, where the question never names the brand, does the brand still come up on its own? Cross-check that the control prompt does NOT surface it.", text:"appears unprompted (vs only when named), cross-check control prompt", evidence:"screenshots" },
+  // SC2.2 GEO source ecosystem (15pts, 4)
+  { id:"AV07", dimension:"AV", subComponent:"SC2.2 GEO source ecosystem quality", subComponentPoints:15, criteriaInSubComponent:4, tag:"M", pattern:"A", inverted:false, sponsorable:false, hint:"Look at the citations listed under each AI answer. Count the distinct sources. Match the count to the level.", text:"AI answers cite 3+ distinct sources (denom = sources cited)", evidence:"screenshots" },
+  { id:"AV08", dimension:"AV", subComponent:"SC2.2 GEO source ecosystem quality", subComponentPoints:15, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Click the cited sources. Is at least one an independent news or review site, not the brand's own site or a press release?", text:"1+ cited source is independent editorial (not own site/PR)", evidence:"screenshot" },
+  { id:"AV09", dimension:"AV", subComponent:"SC2.2 GEO source ecosystem quality", subComponentPoints:15, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"In any engine's citations, does the brand's own domain appear as a listed source?", text:"brand own domain cited by 1+ engine", evidence:"screenshot" },
+  { id:"AV10", dimension:"AV", subComponent:"SC2.2 GEO source ecosystem quality", subComponentPoints:15, criteriaInSubComponent:4, tag:"M", pattern:"B", inverted:true, inlineAnchors:{1:"The main source AI engines cite has significant errors about this brand (wrong prices, specs, or outdated info)",2:"A key cited source has notable inaccuracies about this brand",3:"Sources are mostly accurate; one has minor but noticeable errors",4:"Minor error in a secondary source only; main source is accurate",5:"Every source the AI engines cite is current and factually correct about this brand"}, sponsorable:false, hint:"Open the source the engines cite most. Are its facts about the brand current and correct (prices, specs, availability)? All accurate = 5, dominant source wrong = 1.", text:"no dominant cited source outdated/wrong (inverted, 5 = all accurate, 1 = dominant wrong)", evidence:"notes" },
+  // SC2.3 AEO buyer-Q owned (20pts, 8)
+  { id:"AV11", dimension:"AV", subComponent:"SC2.3 AEO buyer-Q answers on owned surface", subComponentPoints:20, criteriaInSubComponent:8, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"On the brand's own website, search or browse for reliability. Does a page directly answer 'is this brand reliable'?", text:"reliability question answered", evidence:"url or documented absence" },
+  { id:"AV12", dimension:"AV", subComponent:"SC2.3 AEO buyer-Q answers on owned surface", subComponentPoints:20, criteriaInSubComponent:8, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"On the site, can you find what the product actually costs (price list, configurator, starting-at figure)?", text:"pricing question answered", evidence:"url / absence" },
+  { id:"AV13", dimension:"AV", subComponent:"SC2.3 AEO buyer-Q answers on owned surface", subComponentPoints:20, criteriaInSubComponent:8, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"On the site, does any page address resale or residual value?", text:"resale/residual question answered", evidence:"url / absence" },
+  { id:"AV14", dimension:"AV", subComponent:"SC2.3 AEO buyer-Q answers on owned surface", subComponentPoints:20, criteriaInSubComponent:8, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"On the site, does any page state what servicing costs (service schedule, package prices)?", text:"servicing cost question answered", evidence:"url / absence" },
+  { id:"AV15", dimension:"AV", subComponent:"SC2.3 AEO buyer-Q answers on owned surface", subComponentPoints:20, criteriaInSubComponent:8, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"On the site, are warranty terms spelled out (years, kilometres, what is covered)?", text:"warranty terms answered", evidence:"url / absence" },
+  { id:"AV16", dimension:"AV", subComponent:"SC2.3 AEO buyer-Q answers on owned surface", subComponentPoints:20, criteriaInSubComponent:8, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"On the site, is there content answering the key questions buyers have about the brand's specific technology variant (e.g. charging and range for EV, software setup for tech products, formulation details for pharma)?", text:"technology-variant questions answered on owned site", evidence:"url / absence" },
+  { id:"AV17", dimension:"AV", subComponent:"SC2.3 AEO buyer-Q answers on owned surface", subComponentPoints:20, criteriaInSubComponent:8, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"On the site, does any page cover safety (crash ratings, airbags, driver assistance)?", text:"safety question answered", evidence:"url / absence" },
+  { id:"AV18", dimension:"AV", subComponent:"SC2.3 AEO buyer-Q answers on owned surface", subComponentPoints:20, criteriaInSubComponent:8, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"On the site, does any page make the case for choosing this brand over the market leader?", text:"'why brand over [leader]' question answered", evidence:"url / absence" },
+  // SC2.4 AEO quality (15pts, 4)
+  { id:"AV19", dimension:"AV", subComponent:"SC2.4 AEO answer quality + structure", subComponentPoints:15, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Open the FAQ or answer pages. Are answers laid out as question-then-answer blocks rather than buried inside long paragraphs?", text:"answers in structured FAQ format, not buried prose", evidence:"url" },
+  { id:"AV20", dimension:"AV", subComponent:"SC2.4 AEO answer quality + structure", subComponentPoints:15, criteriaInSubComponent:4, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Open validator.schema.org, paste the FAQ page URL. Does a FAQPage block appear in the detected items?", text:"FAQ pages carry valid FAQPage schema", evidence:"validator" },
+  { id:"AV21", dimension:"AV", subComponent:"SC2.4 AEO answer quality + structure", subComponentPoints:15, criteriaInSubComponent:4, tag:"M", pattern:"E", inverted:false, sponsorable:false, hint:"Read the first lines under several question headings. Does a direct 40-60 word answer come FIRST, with detail after? Match how consistently to the level.", text:"answers direct: 40-60 word answer-first (benchmark)", evidence:"page notes" },
+  { id:"AV22", dimension:"AV", subComponent:"SC2.4 AEO answer quality + structure", subComponentPoints:15, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Spot-check the prices, specs, and dates inside the answers against current reality. Is everything up to date?", text:"answers current, no outdated pricing/specs", evidence:"url" },
+  // SC2.5 AEO comparison (15pts, 3)
+  { id:"AV23", dimension:"AV", subComponent:"SC2.5 AEO comparison content", subComponentPoints:15, criteriaInSubComponent:3, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"On the brand's site, is there a page comparing the brand head-to-head against its main competitor?", text:"1+ head-to-head vs primary competitor on owned surface", evidence:"url / absence" },
+  { id:"AV24", dimension:"AV", subComponent:"SC2.5 AEO comparison content", subComponentPoints:15, criteriaInSubComponent:3, tag:"M", pattern:"D", inverted:false, sponsorable:false, hint:"On that comparison page, tick which of these it covers: resale, service, reliability, price, specs. Match the count to the level.", text:"comparison covers objection axes (set = {resale, service, reliability, price, specs})", evidence:"page" },
+  { id:"AV25", dimension:"AV", subComponent:"SC2.5 AEO comparison content", subComponentPoints:15, criteriaInSubComponent:3, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Check the comparison page is indexed (site: search) and reachable from the site's own menus or links, not orphaned.", text:"comparison content indexed + linked, not orphaned", evidence:"site: + link check" },
+  // SC2.6 Objection preemption (10pts, 2)
+  { id:"AV26", dimension:"AV", subComponent:"SC2.6 Objection preemption", subComponentPoints:10, criteriaInSubComponent:2, tag:"M", pattern:"D", inverted:false, sponsorable:false, hint:"Take the top objections logged during RC research. How many are answered somewhere on the brand's own site? Match the share to the level.", text:"known 3rd-party objections addressed in owned content (set = objections found in RC research, run RC first)", evidence:"cross-ref" },
+  { id:"AV27", dimension:"AV", subComponent:"SC2.6 Objection preemption", subComponentPoints:10, criteriaInSubComponent:2, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"For the single most-repeated objection, is there a dedicated piece of brand content countering it?", text:"brand publishes content countering single most-repeated objection", evidence:"url / absence" },
+
+  // ========== DE, Digital Experience (39) ==========
+  // SC3.1 IA completeness (20pts, 10)
+  { id:"DE01", dimension:"DE", subComponent:"SC3.1 Info architecture completeness", subComponentPoints:20, criteriaInSubComponent:10, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Open the site menu. Is there an About or brand story page that says who the brand is?", text:"about/brand story page exists", evidence:"url" },
+  { id:"DE02", dimension:"DE", subComponent:"SC3.1 Info architecture completeness", subComponentPoints:20, criteriaInSubComponent:10, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Does every model in the range have its own dedicated page?", text:"dedicated page per model", evidence:"urls" },
+  { id:"DE03", dimension:"DE", subComponent:"SC3.1 Info architecture completeness", subComponentPoints:20, criteriaInSubComponent:10, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Is there a page about life after purchase (ownership, after-sales)?", text:"ownership/after-sales page", evidence:"url" },
+  { id:"DE04", dimension:"DE", subComponent:"SC3.1 Info architecture completeness", subComponentPoints:20, criteriaInSubComponent:10, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Is there a page describing servicing and maintenance?", text:"service + maintenance page", evidence:"url" },
+  { id:"DE05", dimension:"DE", subComponent:"SC3.1 Info architecture completeness", subComponentPoints:20, criteriaInSubComponent:10, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Is there a page with warranty information?", text:"warranty info page", evidence:"url" },
+  { id:"DE06", dimension:"DE", subComponent:"SC3.1 Info architecture completeness", subComponentPoints:20, criteriaInSubComponent:10, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Is there a finance or leasing page?", text:"finance/leasing page", evidence:"url" },
+  { id:"DE07", dimension:"DE", subComponent:"SC3.1 Info architecture completeness", subComponentPoints:20, criteriaInSubComponent:10, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Is there a page making the 'why us' or comparison case?", text:"comparison/why-us page", evidence:"url" },
+  { id:"DE08", dimension:"DE", subComponent:"SC3.1 Info architecture completeness", subComponentPoints:20, criteriaInSubComponent:10, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Is there a page where a customer can book an appointment, trial, or consultation?", text:"appointment / booking page", evidence:"url" },
+  { id:"DE09", dimension:"DE", subComponent:"SC3.1 Info architecture completeness", subComponentPoints:20, criteriaInSubComponent:10, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Is there a contact page showing the physical location (map, address, directions)?", text:"contact + location page", evidence:"url" },
+  { id:"DE10", dimension:"DE", subComponent:"SC3.1 Info architecture completeness", subComponentPoints:20, criteriaInSubComponent:10, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Is there an FAQ page?", text:"FAQ page", evidence:"url" },
+  // SC3.2 Mobile (15pts, 5)
+  { id:"DE11", dimension:"DE", subComponent:"SC3.2 Mobile experience", subComponentPoints:15, criteriaInSubComponent:5, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Run the homepage through a mobile-friendly check (Lighthouse mobile or Search Console test). Does it pass?", text:"passes Google mobile-friendly test", evidence:"result" },
+  { id:"DE12", dimension:"DE", subComponent:"SC3.2 Mobile experience", subComponentPoints:15, criteriaInSubComponent:5, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Open the site on a phone or in F12 device mode. Scroll every key page. No sideways scrolling, no broken layout?", text:"no horizontal scroll / layout break on mobile viewport", evidence:"mobile screenshot" },
+  { id:"DE13", dimension:"DE", subComponent:"SC3.2 Mobile experience", subComponentPoints:15, criteriaInSubComponent:5, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"In the phone view, tap the buttons and links. Are they big enough to hit without zooming?", text:"tap targets adequately sized", evidence:"mobile screenshot" },
+  { id:"DE14", dimension:"DE", subComponent:"SC3.2 Mobile experience", subComponentPoints:15, criteriaInSubComponent:5, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"On the phone, open the menu. Does it open, scroll, and navigate correctly?", text:"mobile nav functional", evidence:"notes" },
+  { id:"DE15", dimension:"DE", subComponent:"SC3.2 Mobile experience", subComponentPoints:15, criteriaInSubComponent:5, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"On the phone, read the body text. Is it legible without pinch-zooming?", text:"text legible without zoom on mobile", evidence:"screenshot" },
+  // SC3.3 Lead capture (15pts, 5)
+  { id:"DE16", dimension:"DE", subComponent:"SC3.3 Lead capture", subComponentPoints:15, criteriaInSubComponent:5, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Load the homepage on desktop. Without scrolling at all, is there at least one clear action button (book, enquire, call)?", text:"1+ lead CTA above the fold on homepage", evidence:"screenshot" },
+  { id:"DE17", dimension:"DE", subComponent:"SC3.3 Lead capture", subComponentPoints:15, criteriaInSubComponent:5, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Across the site, are there multiple ways to act (book an appointment, WhatsApp, call, enquiry form), not just one form?", text:"multiple CTA types, not just one", evidence:"screenshots" },
+  { id:"DE18", dimension:"DE", subComponent:"SC3.3 Lead capture", subComponentPoints:15, criteriaInSubComponent:5, tag:"M", pattern:"bespoke-DE18", inverted:false, sponsorable:false, hint:"Fill out the main contact or booking form yourself. Does it ask only for what it needs, with an obvious purpose? Match to the level.", text:"form is low-friction", evidence:"form screenshot" },
+  { id:"DE19", dimension:"DE", subComponent:"SC3.3 Lead capture", subComponentPoints:15, criteriaInSubComponent:5, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Submit the form with test data. Does a clear confirmation appear telling you what happens next?", text:"form submission has clear confirmation state", evidence:"screenshot" },
+  { id:"DE20", dimension:"DE", subComponent:"SC3.3 Lead capture", subComponentPoints:15, criteriaInSubComponent:5, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Besides forms, can you reach the brand directly (visible phone number, WhatsApp button, physical address)?", text:"contact beyond form (phone / WhatsApp / address)", evidence:"screenshot" },
+  // SC3.4 Purchase journey (15pts, 4)
+  { id:"DE21", dimension:"DE", subComponent:"SC3.4 Purchase journey", subComponentPoints:15, criteriaInSubComponent:4, tag:"M", pattern:"D", inverted:false, sponsorable:false, hint:"Pretend you know nothing. Using only the site, can you learn each model's specs, features, and differences without calling anyone? Match coverage to the level.", text:"buyer self-educates on models unaided (set = models researchable)", evidence:"notes" },
+  { id:"DE22", dimension:"DE", subComponent:"SC3.4 Purchase journey", subComponentPoints:15, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Does the site let you compare models or variants side by side?", text:"buyer can compare options in-site", evidence:"url" },
+  { id:"DE23", dimension:"DE", subComponent:"SC3.4 Purchase journey", subComponentPoints:15, criteriaInSubComponent:4, tag:"M", pattern:"bespoke-DE23", inverted:false, sponsorable:false, hint:"Walk the whole journey: land, browse, compare, book. Is the next step signposted at each stage? Match to the level.", text:"clear path awareness → action", evidence:"journey notes" },
+  { id:"DE24", dimension:"DE", subComponent:"SC3.4 Purchase journey", subComponentPoints:15, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"While browsing a model, can you find pricing or clear price guidance without leaving the flow?", text:"pricing / guidance accessible in journey", evidence:"url" },
+  // SC3.5 Visual + brand (10pts, 3)
+  { id:"DE25", dimension:"DE", subComponent:"SC3.5 Visual + brand consistency", subComponentPoints:10, criteriaInSubComponent:3, tag:"M", pattern:"E", inverted:false, sponsorable:false, hint:"Flip through five or six pages. Same fonts, colors, button styles, and spacing everywhere? Match to the level.", text:"consistent design system across pages", evidence:"screenshots" },
+  { id:"DE26", dimension:"DE", subComponent:"SC3.5 Visual + brand consistency", subComponentPoints:10, criteriaInSubComponent:3, tag:"M", pattern:"F", inverted:false, sponsorable:false, hint:"Does the site LOOK like the tier the brand claims? Premium claim, premium execution? Match to the level.", text:"visual execution matches positioning", evidence:"screenshots" },
+  { id:"DE27", dimension:"DE", subComponent:"SC3.5 Visual + brand consistency", subComponentPoints:10, criteriaInSubComponent:3, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Hunt for leftover template bits: default fonts, stock icons, lorem ipsum, mismatched styles. Tick yes only if you find none.", text:"no off-brand / template-default elements", evidence:"notes" },
+  // SC3.6 Performance (10pts, 5)
+  { id:"DE28", dimension:"DE", subComponent:"SC3.6 Performance", subComponentPoints:10, criteriaInSubComponent:4, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"On pagespeed.web.dev, desktop tab: is the overall Performance score 70 or higher?", text:"desktop PSI performance ≥ 70", evidence:"PSI" },
+
+  { id:"DE30", dimension:"DE", subComponent:"SC3.6 Performance", subComponentPoints:10, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Browse the main pages watching​‍​‌ for broken image icons or missing banners. Does every image load?", text:"no broken images / assets on primary pages", evidence:"notes" },
+  { id:"DE31", dimension:"DE", subComponent:"SC3.6 Performance", subComponentPoints:10, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Look for placeholder or dummy content live on the site ('coming soon' stubs, lorem ipsum). Tick yes only if none is found.", text:"no placeholder / dummy content live", evidence:"notes" },
+  { id:"DE32", dimension:"DE", subComponent:"SC3.6 Performance", subComponentPoints:10, criteriaInSubComponent:4, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Press F12, open the Console tab, reload and click around. Any red errors that break functionality? Tick yes only if none.", text:"no console errors breaking function", evidence:"console screenshot" },
+  // SC3.7 Accessibility (5pts, 3)
+  { id:"DE33", dimension:"DE", subComponent:"SC3.7 Accessibility", subComponentPoints:5, criteriaInSubComponent:3, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Run the Lighthouse accessibility audit (F12, Lighthouse tab). Does the image-alt check pass?", text:"images have alt text (a11y scan)", evidence:"scan" },
+  { id:"DE34", dimension:"DE", subComponent:"SC3.7 Accessibility", subComponentPoints:5, criteriaInSubComponent:3, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"In the same Lighthouse report, does the color-contrast check pass?", text:"contrast meets WCAG AA (scan)", evidence:"scan" },
+  { id:"DE35", dimension:"DE", subComponent:"SC3.7 Accessibility", subComponentPoints:5, criteriaInSubComponent:3, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Put the mouse away. Using only Tab, arrows, and Enter, can you move through the menu and reach the booking form?", text:"keyboard navigable", evidence:"notes" },
+  // SC3.8 Ownership content (10pts, 4)
+  { id:"DE36", dimension:"DE", subComponent:"SC3.8 Ownership / post-purchase content", subComponentPoints:10, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Is the service network published (locations, map, contact per service point)?", text:"service network / locations published", evidence:"url" },
+  { id:"DE37", dimension:"DE", subComponent:"SC3.8 Ownership / post-purchase content", subComponentPoints:10, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Are warranty terms detailed enough to answer a real question (duration, kilometre limit, exclusions)?", text:"warranty terms detailed", evidence:"url" },
+  { id:"DE38", dimension:"DE", subComponent:"SC3.8 Ownership / post-purchase content", subComponentPoints:10, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Are there owner resources on the site (manuals, guides, support content)?", text:"owner resources / support content", evidence:"url" },
+  { id:"DE39", dimension:"DE", subComponent:"SC3.8 Ownership / post-purchase content", subComponentPoints:10, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Is there dedicated guidance for the brand's specific product variant covering ownership questions unique to that technology (e.g. charging for EV, care for sustainable materials, setup for cloud products)?", text:"technology-variant ownership guidance", evidence:"url" },
+
+  // ========== BA, Brand Authority (27, BA09 deleted) ==========
+  // SC4.1 Editorial volume + recency (20pts, 5), ALL sponsorable
+  { id:"BA01", dimension:"BA", subComponent:"SC4.1 Editorial volume + recency", subComponentPoints:20, criteriaInSubComponent:5, tag:"S", pattern:null, inverted:false, sponsorable:true, hint:"Google the brand name plus 'review' and plus 'news'. Count distinct articles written by third parties. Are there at least 5?", text:"5+ distinct editorial pieces exist", evidence:"urls" },
+  { id:"BA02", dimension:"BA", subComponent:"SC4.1 Editorial volume + recency", subComponentPoints:20, criteriaInSubComponent:5, tag:"S", pattern:null, inverted:false, sponsorable:true, hint:"Check the article dates. Is coverage spread over time, not just one burst at launch?", text:"coverage beyond launch window (ongoing)", evidence:"dated urls" },
+  { id:"BA03", dimension:"BA", subComponent:"SC4.1 Editorial volume + recency", subComponentPoints:20, criteriaInSubComponent:5, tag:"S", pattern:null, inverted:false, sponsorable:true, hint:"Is at least one third-party piece dated within the last 90 days?", text:"1+ piece in last 90 days", evidence:"dated url" },
+  { id:"BA04", dimension:"BA", subComponent:"SC4.1 Editorial volume + recency", subComponentPoints:20, criteriaInSubComponent:5, tag:"S", pattern:null, inverted:false, sponsorable:true, hint:"Are the pieces spread across at least three different outlets?", text:"coverage across 3+ outlets", evidence:"urls" },
+  { id:"BA05", dimension:"BA", subComponent:"SC4.1 Editorial volume + recency", subComponentPoints:20, criteriaInSubComponent:5, tag:"S", pattern:null, inverted:false, sponsorable:true, hint:"Run the same searches for two or three rival brands at the same stage. How does this brand's coverage volume compare? Match to the level.", text:"volume vs category peers same stage", evidence:"comparison notes" },
+  // SC4.2 Editorial quality (15pts, 3, BA09 removed, points redistributed across BA06/07/08)
+  { id:"BA06", dimension:"BA", subComponent:"SC4.2 Editorial quality", subComponentPoints:15, criteriaInSubComponent:3, tag:"M", pattern:"C", inverted:false, sponsorable:false, hint:"Read three or four articles side by side with the brand's press release. Do they add their own reporting, or repeat the release word for word? Match to the level.", text:"independent editorial, not PR-rewrite", evidence:"content compare" },
+  { id:"BA07", dimension:"BA", subComponent:"SC4.2 Editorial quality", subComponentPoints:15, criteriaInSubComponent:3, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Does at least one piece deliver an actual verdict or opinion rather than just announcing?", text:"1+ piece carries editorial verdict, not just announcement", evidence:"url" },
+  { id:"BA08", dimension:"BA", subComponent:"SC4.2 Editorial quality", subComponentPoints:15, criteriaInSubComponent:3, tag:"M", pattern:"F", inverted:false, sponsorable:false, hint:"Are any pieces in the country's top-tier outlets (main newspapers, biggest news portals)? Match to the level.", text:"coverage in tier-1 outlets", evidence:"urls" },
+  // (BA09 intentionally deleted, sponsored/earned owned by tri-state criteria only)
+  // SC4.3 Exec thought leadership (15pts, 4)
+  { id:"BA10", dimension:"BA", subComponent:"SC4.3 Exec thought leadership", subComponentPoints:15, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Search the news for the CEO or country head by name. Is a named executive quoted in independent press?", text:"named exec quoted in independent press", evidence:"url" },
+  { id:"BA11", dimension:"BA", subComponent:"SC4.3 Exec thought leadership", subComponentPoints:15, criteriaInSubComponent:4, tag:"M", pattern:"F", inverted:false, sponsorable:false, hint:"Read the longest executive interview you can find. Substantive commentary, or a one-line launch soundbite? Match to the level.", text:"exec substantive interview, not soundbite", evidence:"url" },
+  { id:"BA12", dimension:"BA", subComponent:"SC4.3 Exec thought leadership", subComponentPoints:15, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Has an executive appeared on a podcast, panel, or conference stage? Look for the episode, video, or event page.", text:"exec on podcast / panel / stage", evidence:"url" },
+  { id:"BA13", dimension:"BA", subComponent:"SC4.3 Exec thought leadership", subComponentPoints:15, criteriaInSubComponent:4, tag:"M", pattern:"C", inverted:false, sponsorable:false, hint:"Does the executive publish original industry commentary (LinkedIn articles, columns) or get cited for original views? Match to the level.", text:"exec publishes / cited for original industry commentary", evidence:"url" },
+  // SC4.4 Independent expert reviews (15pts, 4)
+  { id:"BA14", dimension:"BA", subComponent:"SC4.4 Independent expert reviews", subComponentPoints:15, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Search YouTube and Google for '[brand or model] review' by independent reviewers. Does at least one exist?", text:"1+ independent expert review exists", evidence:"url" },
+  { id:"BA15", dimension:"BA", subComponent:"SC4.4 Independent expert reviews", subComponentPoints:15, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Are there independent expert reviews in BOTH written and video form?", text:"expert reviews across 2+ formats (written + video)", evidence:"urls" },
+  { id:"BA16", dimension:"BA", subComponent:"SC4.4 Independent expert reviews", subComponentPoints:15, criteriaInSubComponent:4, tag:"M", pattern:"F", inverted:false, sponsorable:false, hint:"Check who the reviewers are. Career category specialists, or general lifestyle accounts? Match to the level.", text:"reviewers are credible category specialists", evidence:"reviewer notes" },
+  { id:"BA17", dimension:"BA", subComponent:"SC4.4 Independent expert reviews", subComponentPoints:15, criteriaInSubComponent:4, tag:"M", pattern:"B", inverted:false, sponsorable:false, hint:"Read or watch the reviews and note each verdict. Is the overall expert verdict net favorable? Match to the level.", text:"overall expert verdict net favorable", evidence:"review summary" },
+  // SC4.5 Awards (10pts, 3, sponsorable)
+  { id:"BA18", dimension:"BA", subComponent:"SC4.5 Awards + recognition", subComponentPoints:10, criteriaInSubComponent:2, tag:"S", pattern:null, inverted:false, sponsorable:true, hint:"Search '[brand] award' or '[brand] recognition'. Has the brand won or been shortlisted for a credible award from an independent body (not self-issued or pay-to-display)?", text:"won / shortlisted for credible award from independent body", evidence:"url" },
+  { id:"BA20", dimension:"BA", subComponent:"SC4.5 Awards + recognition", subComponentPoints:10, criteriaInSubComponent:2, tag:"S", pattern:null, inverted:false, sponsorable:true, hint:"Check the award dates. Is the recognition from the current or immediately previous year?", text:"recognition is current", evidence:"date" },
+  // SC4.6 Backlinks (10pts, 3)
+  { id:"BA21", dimension:"BA", subComponent:"SC4.6 Backlinks from authoritative sources", subComponentPoints:10, criteriaInSubComponent:3, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Run the domain through a free backlink checker (e.g. Ahrefs free backlink checker). Do links from high-authority domains appear?", text:"backlinks from high-authority domains", evidence:"backlink tool export" },
+  { id:"BA22", dimension:"BA", subComponent:"SC4.6 Backlinks from authoritative sources", subComponentPoints:10, criteriaInSubComponent:3, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Scan the backlink sample. Are some links placed inside real article text, not just directory listings?", text:"editorial in-content backlinks, not just directories", evidence:"backlink sample" },
+  { id:"BA23", dimension:"BA", subComponent:"SC4.6 Backlinks from authoritative sources", subComponentPoints:10, criteriaInSubComponent:3, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"In the same tool, is the overall profile clean, with no flood of spammy domains dominating it?", text:"backlink profile clean, no dominant spam", evidence:"tool" },
+  // SC4.7 Corporate authority (10pts, 3)
+  { id:"BA24", dimension:"BA", subComponent:"SC4.7 Corporate authority", subComponentPoints:10, criteriaInSubComponent:3, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Is the brand backed by a credible corporate parent, and is that standing visible (about page, press, corporate site)?", text:"credible corporate parent / visible corporate standing", evidence:"notes" },
+  { id:"BA25", dimension:"BA", subComponent:"SC4.7 Corporate authority", subComponentPoints:10, criteriaInSubComponent:3, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Can you find corporate governance or disclosure information publicly (annual report, corporate site)?", text:"corporate governance / disclosure visible", evidence:"url" },
+  { id:"BA26", dimension:"BA", subComponent:"SC4.7 Corporate authority", subComponentPoints:10, criteriaInSubComponent:3, tag:"M", pattern:"B", inverted:true, inlineAnchors:{1:"A major unresolved controversy or legal matter is actively in public circulation",2:"A notable controversy exists and has not been publicly addressed",3:"One minor controversy, mostly settled or fading",4:"No significant controversy; only isolated past complaints",5:"Clean public record: no controversy, scandal, or unresolved dispute found"}, sponsorable:false, hint:"Google '[brand] controversy', 'scandal', 'lawsuit'. A clean record = 5. One dominant unresolved story = 1.", text:"no dominant unresolved public controversy (inverted, 5 = clean, 1 = major controversy)", evidence:"search notes" },
+  // SC4.8 3rd-party category placement (5pts, 2, sponsorable)
+  { id:"BA27", dimension:"BA", subComponent:"SC4.8 3rd-party category placement", subComponentPoints:5, criteriaInSubComponent:2, tag:"S", pattern:null, inverted:false, sponsorable:true, hint:"Search independent 'best [category] [country]' listicles. Does the brand appear in any list the brand did not write?", text:"appears in independent 'best of' / listicle", evidence:"url" },
+  { id:"BA28", dimension:"BA", subComponent:"SC4.8 3rd-party category placement", subComponentPoints:5, criteriaInSubComponent:2, tag:"S", pattern:null, inverted:false, sponsorable:true, hint:"Is the brand featured, listed, or reviewed in a publication its actual buyers read?", text:"placement in market-relevant publication", evidence:"url" },
+
+  // ========== SC, Social & Content (28) ==========
+  // SC5.1 Platform selection (10pts, 4)
+  { id:"SC01", dimension:"SC", subComponent:"SC5.1 Platform selection + setup", subComponentPoints:10, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"List the platforms that matter for this industry, then open each one and find the brand. Present on all of them? Cross-check the platforms found in SV03.", text:"present on every platform relevant to industry", evidence:"profile urls" },
+  { id:"SC02", dimension:"SC", subComponent:"SC5.1 Platform selection + setup", subComponentPoints:10, criteriaInSubComponent:4, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Look at each profile's URL. Proper vanity handles (instagram.com/brandx), not raw IDs (profile.php?id=1234)?", text:"all profiles use pro vanity handles (no profile.php / search-url)", evidence:"urls" },
+  { id:"SC03", dimension:"SC", subComponent:"SC5.1 Platform selection + setup", subComponentPoints:10, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Open every profile. Bio filled in, website link present, contact method, proper avatar, on every single one?", text:"all profiles complete (bio / link / contact / avatar)", evidence:"screenshots" },
+  { id:"SC04", dimension:"SC", subComponent:"SC5.1 Platform selection + setup", subComponentPoints:10, criteriaInSubComponent:4, tag:"M", pattern:"F", inverted:false, sponsorable:false, hint:"Is any platform where this industry's buyers actually spend time completely missing? Match to the level.", text:"no critical platform absent", evidence:"notes" },
+  // SC5.2 Cadence (10pts, 3)
+  { id:"SC05", dimension:"SC", subComponent:"SC5.2 Cadence + consistency", subComponentPoints:10, criteriaInSubComponent:3, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Open the primary platform and read post dates for the last two months. At least one post per week?", text:"posts on primary platform ≥ weekly", evidence:"post dates" },
+  { id:"SC06", dimension:"SC", subComponent:"SC5.2 Cadence + consistency", subComponentPoints:10, criteriaInSubComponent:3, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Scan the last six months of post dates. Is there any silent gap longer than 30 days? Tick yes only if there is no such gap.", text:"no dormant gap > 30 days on primary", evidence:"post dates" },
+  { id:"SC07", dimension:"SC", subComponent:"SC5.2 Cadence + consistency", subComponentPoints:10, criteriaInSubComponent:3, tag:"M", pattern:"E", inverted:false, sponsorable:false, hint:"Look at the posting rhythm across months. A steady cadence, or bursts followed by silence? Match to the level.", text:"cadence consistent, not burst-silence", evidence:"post timeline" },
+  // SC5.3 Visual identity + creative (20pts, 5)
+  { id:"SC08", dimension:"SC", subComponent:"SC5.3 Visual identity + creative", subComponentPoints:20, criteriaInSubComponent:5, tag:"M", pattern:"E", inverted:false, sponsorable:false, hint:"Open the feed as a grid and look at the last 20 posts as one wall. Is the color palette consistent? Match to the level.", text:"consistent palette last 20 posts", evidence:"feed screenshot" },
+  { id:"SC09", dimension:"SC", subComponent:"SC5.3 Visual identity + creative", subComponentPoints:20, criteriaInSubComponent:5, tag:"M", pattern:"E", inverted:false, sponsorable:false, hint:"Same 20 posts: same fonts and graphic system throughout? Match to the level.", text:"consistent typography / graphic system across 20 posts", evidence:"feed" },
+  { id:"SC10", dimension:"SC", subComponent:"SC5.3 Visual identity + creative", subComponentPoints:20, criteriaInSubComponent:5, tag:"M", pattern:"C", inverted:false, sponsorable:false, hint:"Are the photos original shoots (local settings, own premises, real staff and customers) or stock and manufacturer images? Match to the level.", text:"original photography, not manufacturer stock", evidence:"feed" },
+  { id:"SC11", dimension:"SC", subComponent:"SC5.3 Visual identity + creative", subComponentPoints:20, criteriaInSubComponent:5, tag:"M", pattern:"E", inverted:false, sponsorable:false, hint:"Squint at the grid. Does it read as one cohesive branded world? Match to the level.", text:"feed reads as cohesive branded world", evidence:"feed" },
+  { id:"SC12", dimension:"SC", subComponent:"SC5.3 Visual identity + creative", subComponentPoints:20, criteriaInSubComponent:5, tag:"M", pattern:"F", inverted:false, sponsorable:false, hint:"Does the creative quality match the price tier the brand claims? Match to the level.", text:"creative quality matches positioning tier", evidence:"feed" },
+  // SC5.4 Content mix (15pts, 4)
+  { id:"SC13", dimension:"SC", subComponent:"SC5.4 Content mix across pillars", subComponentPoints:15, criteriaInSubComponent:4, tag:"M", pattern:"D", inverted:false, sponsorable:false, hint:"Tag the last 20 posts by pillar (product, lifestyle, people, education, events, ownership). How many pillars are covered? Match to the level.", text:"spans 4+ pillars (set = {product, lifestyle, people, education, events, ownership})", evidence:"post tagging" },
+  { id:"SC14", dimension:"SC", subComponent:"SC5.4 Content mix across pillars", subComponentPoints:15, criteriaInSubComponent:4, tag:"M", pattern:"D", inverted:true, inlineAnchors:{1:"Over 80% of posts are product launches or announcements, no real content variety",2:"Heavy product focus (60-80%); very limited other content types",3:"Product still dominates (40-60%) but some variety exists",4:"Good mix across 3-4 content pillars; product is present but not dominant",5:"Balanced across all pillar types; no single content type exceeds 40%"}, sponsorable:false, hint:"From that tagging, what share are product or announcement posts? Balanced mix = 5, more than 80% product = 1.", text:"not product/announcement dominated (inverted, 5 = balanced, 1 = >80% product)", evidence:"post tagging" },
+  { id:"SC15", dimension:"SC", subComponent:"SC5.4 Content mix across pillars", subComponentPoints:15, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Point to actual lifestyle or world-building posts (not product shots). Do they exist?", text:"lifestyle / world-building content present", evidence:"post examples" },
+  { id:"SC16", dimension:"SC", subComponent:"SC5.4 Content mix across pillars", subComponentPoints:15, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Point to educational or ownership content (how-tos, care tips, owner guides). Does it exist?", text:"educational / ownership content present", evidence:"post examples" },
+  // SC5.5 Storytelling (15pts, 3)
+  { id:"SC17", dimension:"SC", subComponent:"SC5.5 Storytelling + voice", subComponentPoints:15, criteriaInSubComponent:3, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Does the brand publish original long-form anywhere (blog, long YouTube videos, newsletter)?", text:"publishes original long-form / narrative somewhere", evidence:"url" },
+  { id:"SC18", dimension:"SC", subComponent:"SC5.5 Storytelling + voice", subComponentPoints:15, criteriaInSubComponent:3, tag:"M", pattern:"E", inverted:false, sponsorable:false, hint:"Read ten captions in a row. A distinct recognizable voice, or interchangeable announcements? Match to the level.", text:"recognizable editorial voice", evidence:"content sample" },
+  { id:"SC19", dimension:"SC", subComponent:"SC5.5 Storytelling + voice", subComponentPoints:15, criteriaInSubComponent:3, tag:"M", pattern:"C", inverted:false, sponsorable:false, hint:"Does the content tell this local brand's own story, or only recycle the global manufacturer's material? Match to the level.", text:"tells own story, not just manufacturer global story", evidence:"content sample" },
+  // SC5.6 Video strategy (10pts, 3)
+  { id:"SC20", dimension:"SC", subComponent:"SC5.6 Video strategy", subComponentPoints:10, criteriaInSubComponent:3, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Scroll the primary feed. Is there native video (Reels, uploaded video), not just still images?", text:"native video on primary platform", evidence:"post" },
+  { id:"SC21", dimension:"SC", subComponent:"SC5.6 Video strategy", subComponentPoints:10, criteriaInSubComponent:3, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Is video published in the right format per platform (vertical Reels and Shorts, long-form on YouTube)?", text:"format appropriate per platform (Reels / Shorts / long)", evidence:"examples" },
+  { id:"SC22", dimension:"SC", subComponent:"SC5.6 Video strategy", subComponentPoints:10, criteriaInSubComponent:3, tag:"M", pattern:"F", inverted:false, sponsorable:false, hint:"Watch two or three videos. Does production quality match the claimed tier? Match to the level.", text:"video production quality matches positioning", evidence:"video sample" },
+  // SC5.7 Engagement quality (10pts, 3)
+  { id:"SC23", dimension:"SC", subComponent:"SC5.7 Engagement quality", subComponentPoints:10, criteriaInSubComponent:3, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Enter the last 10 posts' numbers in the SC inputs above. Is the computed weighted ER 1.0% or higher? (1% is the minimum floor for meaningful engagement; strong brands typically hit 2-3%)", text:"weighted ER last 10 posts ≥ 1.0% (floor threshold)", evidence:"calc" },
+  { id:"SC24", dimension:"SC", subComponent:"SC5.7 Engagement quality", subComponentPoints:10, criteriaInSubComponent:3, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Open the comments on recent posts. Does the brand visibly reply to questions and DMs?", text:"brand responds to comments / DMs", evidence:"screenshots" },
+  { id:"SC25", dimension:"SC", subComponent:"SC5.7 Engagement quality", subComponentPoints:10, criteriaInSubComponent:3, tag:"M", pattern:"B", inverted:false, sponsorable:false, hint:"Compare follower count to actual interaction. Real conversations, or a big following with dead comments? Match to the level.", text:"genuine interaction, not bought / vanity", evidence:"ER calc + notes" },
+  // SC5.8 Cross-platform (10pts, 3)
+  { id:"SC26", dimension:"SC", subComponent:"SC5.8 Cross-platform integration", subComponentPoints:10, criteriaInSubComponent:3, tag:"M", pattern:"E", inverted:false, sponsorable:false, hint:"Open all the platforms side by side. Is it the same brand world across every one? Match to the level.", text:"brand world coherent across platforms", evidence:"multi-platform screenshots" },
+  { id:"SC27", dimension:"SC", subComponent:"SC5.8 Cross-platform integration", subComponentPoints:10, criteriaInSubComponent:3, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Enter the FB and IG follower counts in the inputs above. For a recently launched brand, confirm the audience is NOT skewed 10:1 toward Facebook.", text:"audience distribution appropriate for era (no 10:1 FB:IG for new luxury)", evidence:"follower counts" },
+  { id:"SC28", dimension:"SC", subComponent:"SC5.8 Cross-platform integration", subComponentPoints:10, criteriaInSubComponent:3, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Do the platforms point to each other (links in bio, cross-promotions, shared campaigns)?", text:"platforms cross-reference reinforce", evidence:"notes" },
+
+  // ========== RC, Reputation & Community (27) ==========
+  // SC6.1 Review presence (15pts, 5)
+  { id:"RC01", dimension:"RC", subComponent:"SC6.1 Review presence + score", subComponentPoints:15, criteriaInSubComponent:5, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Open the brand's Google Business Profile. Are there customer reviews on it at all?", text:"reviews on GBP", evidence:"GBP" },
+  { id:"RC02", dimension:"RC", subComponent:"SC6.1 Review presence + score", subComponentPoints:15, criteriaInSubComponent:5, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Count reviews across Google, Facebook, and the other relevant platforms. Twenty or more in total?", text:"20+ reviews across relevant platforms", evidence:"screenshots" },
+  { id:"RC03", dimension:"RC", subComponent:"SC6.1 Review presence + score", subComponentPoints:15, criteriaInSubComponent:5, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Is the average rating 4.0 or higher across those platforms?", text:"avg rating 4.0+", evidence:"screenshots" },
+  { id:"RC04", dimension:"RC", subComponent:"SC6.1 Review presence + score", subComponentPoints:15, criteriaInSubComponent:5, tag:"A", pattern:null, inverted:false, sponsorable:false, hint:"Sort reviews by newest. Is there at least one from the last 90 days?", text:"reviews recent (activity < 90 days)", evidence:"dates" },
+  { id:"RC05", dimension:"RC", subComponent:"SC6.1 Review presence + score", subComponentPoints:15, criteriaInSubComponent:5, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Read replies under both positive AND negative reviews. Does the brand respond to both kinds?", text:"brand responds to reviews (pos + neg)", evidence:"screenshots" },
+  // SC6.2 Sentiment (20pts, 4)
+  { id:"RC06", dimension:"RC", subComponent:"SC6.2 Sentiment of public discourse", subComponentPoints:20, criteriaInSubComponent:4, tag:"M", pattern:"B", inverted:false, sponsorable:false, hint:"Collect 20 public mentions (forums, groups, comment threads) and code each positive, neutral, or negative. Net positive? Match to the level.", text:"sampled discourse net positive (sample = 20 items)", evidence:"coded sample" },
+  { id:"RC07", dimension:"RC", subComponent:"SC6.2 Sentiment of public discourse", subComponentPoints:20, criteriaInSubComponent:4, tag:"M", pattern:"B", inverted:true, inlineAnchors:{1:"One specific complaint (e.g. resale, reliability, service) dominates the sample with no brand response visible",2:"A recurring objection is present and largely unanswered",3:"A repeated objection exists but with some brand acknowledgment",4:"No dominant objection; only minor scattered themes",5:"No single complaint dominates; discourse is varied and no objection goes unanswered"}, sponsorable:false, hint:"In your 20-item sample, does one complaint theme repeat again and again with no answer? No dominant unanswered objection = 5.", text:"no single objection dominates unaddressed (inverted, 5 = no dominant objection, 1 = single objection dominates)", evidence:"coded sample" },
+  { id:"RC08", dimension:"RC", subComponent:"SC6.2 Sentiment of public discourse", subComponentPoints:20, criteriaInSubComponent:4, tag:"M", pattern:"bespoke-RC8", inverted:false, sponsorable:false, hint:"Is the discourse driven by genuine advocacy, or is it mostly silence? Near-silence = 1 and flag it as a gap. Match to the level.", text:"driven by advocacy, not silence", evidence:"sample" },
+  { id:"RC09", dimension:"RC", subComponent:"SC6.2 Sentiment of public discourse", subComponentPoints:20, criteriaInSubComponent:4, tag:"M", pattern:"B", inverted:false, sponsorable:false, hint:"Look at the negative items you coded. One-off gripes, or the same systemic issue repeating? Match to the level.", text:"negatives isolated, not systemic", evidence:"sample" },
+  // SC6.3 Owner testimonials (15pts, 4)
+  { id:"RC10", dimension:"RC", subComponent:"SC6.3 Owner testimonials + stories", subComponentPoints:15, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Search for owner testimonials: posts, videos, or quotes from actual customers. Do any exist in public?", text:"owner testimonials exist public", evidence:"urls" },
+  { id:"RC11", dimension:"RC", subComponent:"SC6.3 Owner testimonials + stories", subComponentPoints:15, criteriaInSubComponent:4, tag:"M", pattern:"A", inverted:false, sponsorable:false, hint:"Count distinct owner stories from different people. Match the count to the level.", text:"multiple distinct owner stories (denom = stories found)", evidence:"urls" },
+  { id:"RC12", dimension:"RC", subComponent:"SC6.3 Owner testimonials + stories", subComponentPoints:15, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Check where the stories live. Only on the brand's own channels, or also on owners' own accounts and forums?", text:"stories appear organic, not only brand-published", evidence:"source notes" },
+  { id:"RC13", dimension:"RC", subComponent:"SC6.3 Owner testimonials + stories", subComponentPoints:15, criteriaInSubComponent:4, tag:"M", pattern:"F", inverted:false, sponsorable:false, hint:"Read the testimonials. Specific details (model, usage, numbers), or generic praise? Match to the level.", text:"testimonials specific + credible, not generic", evidence:"examples" },
+  // SC6.4 Category community (15pts, 4)
+  { id:"RC14", dimension:"RC", subComponent:"SC6.4 Category community presence", subComponentPoints:15, criteriaInSubComponent:4, tag:"M", pattern:"A", inverted:false, sponsorable:false, hint:"Search the primary enthusiast​‍​‌ community (top national forum or group) for the brand. Zero mentions = 1, recurring active threads = 5.", text:"discussed in primary enthusiast community", evidence:"forum search" },
+  { id:"RC15", dimension:"RC", subComponent:"SC6.4 Category community presence", subComponentPoints:15, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Open the relevant category groups and forums. Is the brand present or discussed inside them?", text:"present in relevant category groups (FB / forums)", evidence:"screenshots" },
+  { id:"RC16", dimension:"RC", subComponent:"SC6.4 Category community presence", subComponentPoints:15, criteriaInSubComponent:4, tag:"M", pattern:"C", inverted:false, sponsorable:false, hint:"Read the threads. Started by real members, or planted and spammed by the brand? Match to the level.", text:"discussion organic, not brand-spammed", evidence:"thread notes" },
+  { id:"RC17", dimension:"RC", subComponent:"SC6.4 Category community presence", subComponentPoints:15, criteriaInSubComponent:4, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Where brand reps appear in communities, are they helpful and constructive (answering, not pitching)?", text:"brand / reps participate constructively where appropriate", evidence:"screenshots" },
+  // SC6.5 UGC (10pts, 3)
+  { id:"RC18", dimension:"RC", subComponent:"SC6.5 UGC volume", subComponentPoints:10, criteriaInSubComponent:3, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Search the brand hashtag and location tags. Do customers post about the brand unprompted?", text:"organic UGC exists", evidence:"urls" },
+  { id:"RC19", dimension:"RC", subComponent:"SC6.5 UGC volume", subComponentPoints:10, criteriaInSubComponent:3, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Is that user-generated content visible on at least two platforms?", text:"UGC across 2+ platforms", evidence:"urls" },
+  { id:"RC20", dimension:"RC", subComponent:"SC6.5 UGC volume", subComponentPoints:10, criteriaInSubComponent:3, tag:"M", pattern:"A", inverted:false, sponsorable:false, hint:"Count the UGC you found. Is the volume meaningful for the brand's stage? Match to the level.", text:"UGC volume meaningful for stage (denom = UGC found)", evidence:"notes" },
+  // SC6.6 Ambassadors (10pts, 3)
+  { id:"RC21", dimension:"RC", subComponent:"SC6.6 Ambassador + advocate infra", subComponentPoints:10, criteriaInSubComponent:3, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Are there named ambassadors or repeat advocates visibly associated with the brand?", text:"named ambassadors / repeat advocates visible", evidence:"urls" },
+  { id:"RC22", dimension:"RC", subComponent:"SC6.6 Ambassador + advocate infra", subComponentPoints:10, criteriaInSubComponent:3, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Are creator or influencer partnerships visible (tagged collaborations, sponsored series)?", text:"creator / influencer partnerships visible", evidence:"urls" },
+  { id:"RC23", dimension:"RC", subComponent:"SC6.6 Ambassador + advocate infra", subComponentPoints:10, criteriaInSubComponent:3, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Does the brand amplify its advocates (reshares, features, owner spotlights)?", text:"advocacy amplified by brand (reshared / featured)", evidence:"screenshots" },
+  // SC6.7 Objection handling (10pts, 2)
+  { id:"RC24", dimension:"RC", subComponent:"SC6.7 Objection handling in public", subComponentPoints:10, criteriaInSubComponent:2, tag:"M", pattern:"D", inverted:false, sponsorable:false, hint:"Take the most-repeated objection from your discourse sample. Is it visibly addressed in public anywhere? Match to the level.", text:"most-repeated objection visibly addressed (set = top objections)", evidence:"cross-ref" },
+  { id:"RC25", dimension:"RC", subComponent:"SC6.7 Objection handling in public", subComponentPoints:10, criteriaInSubComponent:2, tag:"M", pattern:"B", inverted:false, sponsorable:false, hint:"Find criticism aimed at the brand. Does the brand engage with it, or ignore and delete? Match to the level.", text:"engages criticism, not ignore / delete", evidence:"notes" },
+  // SC6.8 Crisis response (5pts, 2)
+  { id:"RC26", dimension:"RC", subComponent:"SC6.8 Crisis response history", subComponentPoints:5, criteriaInSubComponent:2, tag:"S", pattern:null, inverted:false, sponsorable:false, hint:"Google '[brand] issue', 'recall', 'crisis'. Tick yes only if no unresolved public crisis is visible.", text:"no unresolved public crisis visible", evidence:"search notes" },
+  { id:"RC27", dimension:"RC", subComponent:"SC6.8 Crisis response history", subComponentPoints:5, criteriaInSubComponent:2, tag:"M", pattern:"F", inverted:false, sponsorable:false, hint:"If the brand HAS faced a public test, was the response timely and constructive? Never tested = 5. Match to the level.", text:"where tested, response timely + constructive (default 5 if never tested)", evidence:"notes" }
+];
+
+/* ============================================================
+   ASSERTIONS, halt on mismatch (no silent wrong answers)
+   ============================================================ */
+const EXPECTED_COUNTS = { SV: 49, AV: 27, DE: 38, BA: 26, SC: 28, RC: 27 };
+const EXPECTED_TOTAL = 195;
+const BUILD_ID = "f53fb6c922119870fc09944e822a300a5d6eacbeed067a0ec448427ed6b3e950";
+
+function runAssertions() {
+  const counts = {};
+  for (const c of CRITERIA) counts[c.dimension] = (counts[c.dimension] || 0) + 1;
+  const errors = [];
+  for (const [dim, n] of Object.entries(EXPECTED_COUNTS)) {
+    if (counts[dim] !== n) errors.push(`${dim} count mismatch: got ${counts[dim]}, expected ${n}`);
+  }
+  if (CRITERIA.length !== EXPECTED_TOTAL) errors.push(`total mismatch: ${CRITERIA.length} vs ${EXPECTED_TOTAL}`);
+
+  // Per-dimension sub-component point sums must reconcile to 100
+  const subSums = {};
+  const seenSubComps = {};
+  for (const c of CRITERIA) {
+    const key = c.dimension + "||" + c.subComponent;
+    if (!seenSubComps[key]) {
+      seenSubComps[key] = true;
+      subSums[c.dimension] = (subSums[c.dimension] || 0) + c.subComponentPoints;
+    }
+  }
+  for (const [dim, tot] of Object.entries(subSums)) {
+    if (tot !== 100) errors.push(`${dim} sub-comp point total = ${tot}, expected 100`);
+  }
+
+  // BA06/BA07/BA08 must carry criteriaInSubComponent=3 (SC4.2 post-BA09 deletion)
+  for (const id of ["BA06","BA07","BA08"]) {
+    const c = CRITERIA.find(x => x.id === id);
+    if (!c || c.criteriaInSubComponent !== 3) {
+      errors.push(`${id} criteriaInSubComponent must be 3 (SC4.2 has 3 criteria after BA09 deletion)`);
+    }
+  }
+
+  // Every criterion's criteriaInSubComponent must equal the actual count in that sub-component
+  const subCompCounts = {};
+  for (const c of CRITERIA) {
+    subCompCounts[c.subComponent] = (subCompCounts[c.subComponent] || 0) + 1;
+  }
+  for (const c of CRITERIA) {
+    if (subCompCounts[c.subComponent] !== c.criteriaInSubComponent) {
+      errors.push(`${c.id} declares ${c.criteriaInSubComponent} in "${c.subComponent}" but that sub-comp has ${subCompCounts[c.subComponent]}`);
+    }
+  }
+
+  // Renormalization must reconcile: under EVERY flag combination, the
+  // renormalized points of each applicable dimension sum to exactly 100.
+  const flagNames = Object.keys(APPLICABILITY_FLAGS);
+  for (let mask = 0; mask < (1 << flagNames.length); mask++) {
+    const flags = {};
+    flagNames.forEach((f, i) => flags[f] = !!(mask & (1 << i)));
+    const model = buildPointsModel(flags);
+    for (const d of ["SV","AV","DE","BA","SC","RC"]) {
+      if (!model.dimApplicable[d]) continue;
+      let tot = 0;
+      for (const c of CRITERIA) if (c.dimension === d) tot += model.ptsOf[c.id];
+      if (Math.abs(tot - 100) > 1e-9) {
+        errors.push(`renormalization: ${d} totals ${tot.toFixed(6)} under flags mask ${mask}, expected 100`);
+      }
+    }
+  }
+  return errors;
+}
+
+/* ============================================================
+   APPLICABILITY LAYER (published rules, see 01_Framework/applicability-rules.md)
+   A criterion whose required flag is OFF is N/A: no input, excluded from
+   scoring and counters. Points renormalize so every applicable dimension
+   still totals 100 under any flag combination.
+   ============================================================ */
+const APPLICABILITY_FLAGS = {
+  PHYSICAL_LOCATION:  "The brand has a physical location customers can visit (store, branch, office, or venue).",
+  PHYSICAL_PRODUCT:   "The brand sells tangible products with specific models (e.g. consumer electronics, appliances, vehicles). Not for pure services, software, or financial products.",
+  EV_PHEV:            "The brand has a sub-range or product variant with its own dedicated buyer questions and content (e.g. a premium tier, a specialist line, or a technology-specific category).",
+  BOOKABLE_EXPERIENCE:"The brand offers a bookable appointment, trial, or demonstration (e.g. product demo, consultation, site visit, or test experience)."
+};
+const FLAG_DISPLAY = {
+  PHYSICAL_LOCATION:  "Physical Location",
+  PHYSICAL_PRODUCT:   "Physical Products",
+  EV_PHEV:            "Specialised Product Variant",
+  BOOKABLE_EXPERIENCE:"Bookable Experience"
+};
+const CRIT_FLAGS = {
+  SV31:"PHYSICAL_LOCATION", SV32:"PHYSICAL_LOCATION", SV33:"PHYSICAL_LOCATION",
+  SV34:"PHYSICAL_LOCATION", SV35:"PHYSICAL_LOCATION", SV36:"PHYSICAL_LOCATION",
+  SV37:"PHYSICAL_LOCATION", SV38:"PHYSICAL_LOCATION", SV39:"PHYSICAL_LOCATION",
+  DE09:"PHYSICAL_LOCATION", DE36:"PHYSICAL_LOCATION", RC01:"PHYSICAL_LOCATION", RC04:"PHYSICAL_LOCATION",
+  SV05:"PHYSICAL_PRODUCT", SV24:"PHYSICAL_PRODUCT", SV43:"PHYSICAL_PRODUCT", SV50:"PHYSICAL_PRODUCT",
+  DE02:"PHYSICAL_PRODUCT", DE04:"PHYSICAL_PRODUCT", DE21:"PHYSICAL_PRODUCT", DE22:"PHYSICAL_PRODUCT",
+  AV13:"PHYSICAL_PRODUCT", AV14:"PHYSICAL_PRODUCT",
+  AV16:"EV_PHEV", DE39:"EV_PHEV",
+  DE08:"BOOKABLE_EXPERIENCE"
+};
+
+function isApplicable(c, flags) {
+  const f = CRIT_FLAGS[c.id];
+  return !f || !!flags[f];
+}
+
+// Renormalized point value per criterion under the active flags.
+// Within a sub-component: its points split across APPLICABLE criteria only.
+// A sub-component with zero applicable criteria is dead: its points
+// redistribute proportionally across the live sub-components of the dimension.
+function buildPointsModel(flags) {
+  const subAppl = {};   // subComponent -> applicable criterion count
+  const subPts = {};    // subComponent -> declared points
+  const subDim = {};    // subComponent -> dimension
+  for (const c of CRITERIA) {
+    subPts[c.subComponent] = c.subComponentPoints;
+    subDim[c.subComponent] = c.dimension;
+    subAppl[c.subComponent] = (subAppl[c.subComponent] || 0) + (isApplicable(c, flags) ? 1 : 0);
+  }
+  const liveTotal = {};  // dimension -> sum of live sub-component points
+  for (const sc of Object.keys(subPts)) {
+    if (subAppl[sc] > 0) liveTotal[subDim[sc]] = (liveTotal[subDim[sc]] || 0) + subPts[sc];
+  }
+  const ptsOf = {};      // criterion id -> renormalized point value (0 if N/A)
+  for (const c of CRITERIA) {
+    if (!isApplicable(c, flags) || subAppl[c.subComponent] === 0) { ptsOf[c.id] = 0; continue; }
+    const scale = 100 / liveTotal[c.dimension];  // proportional redistribution of dead sub-components
+    ptsOf[c.id] = (c.subComponentPoints * scale) / subAppl[c.subComponent];
+  }
+  const dimApplicable = {};
+  for (const d of ["SV","AV","DE","BA","SC","RC"]) {
+    dimApplicable[d] = CRITERIA.some(c => c.dimension === d && isApplicable(c, flags));
+  }
+  return { ptsOf, dimApplicable };
+}
+
+/* ============================================================
+   SCORING (pure functions)
+   ============================================================ */
+function critPts(c) {
+  return buildPointsModel(state.flags).ptsOf[c.id];
+}
+
+function critValue(c, state, model) {
+  const pts = (model || buildPointsModel(state.flags)).ptsOf[c.id];
+  if (pts === 0) return 0;  // N/A or dead sub-component
+  const v = state.answers[c.id];
+  if (c.tag === "M") {
+    if (v == null) return 0;
+    const s = Number(v);
+    if (!(s >= 1 && s <= 5)) return 0;
+    return ((s - 1) / 4) * pts;
+  }
+  // Checklist criteria: any item ticked = full points, empty = 0
+  if (c.checklist) {
+    return Array.isArray(v) && v.length > 0 ? pts : 0;
+  }
+  // A/S binary, with tri-state override for BA sponsorables
+  if (c.sponsorable) {
+    if (v === "earned") return pts;
+    if (v === "sponsored") return 0.5 * pts;
+    return 0;
+  }
+  return (v === true || v === "yes") ? pts : 0;
+}
+
+function dimensionScore(dim, state) {
+  const model = buildPointsModel(state.flags);
+  if (!model.dimApplicable[dim]) return null;  // dimension entirely N/A
+  let sum = 0;
+  for (const c of CRITERIA) if (c.dimension === dim) sum += critValue(c, state, model);
+  if (sum > 100) sum = 100;
+  return sum;
+}
+
+function composite(state) {
+  const dims = ["SV","AV","DE","BA","SC","RC"];
+  const scores = dims.map(d => dimensionScore(d, state)).filter(s => s !== null);
+  if (!scores.length) return 0;
+  return scores.reduce((a,b) => a+b, 0) / scores.length;
+}
+
+function maturityBand(score) {
+  if (score <= 20) return { label: "Invisible", cls: "band-invisible" };
+  if (score <= 40) return { label: "Emerging", cls: "band-emerging" };
+  if (score <= 60) return { label: "Developing", cls: "band-developing" };
+  if (score <= 80) return { label: "Established", cls: "band-established" };
+  return { label: "Leading", cls: "band-leading" };
+}
+
+/* ============================================================
+   ENGAGEMENT, per-post-then-average path (locked)
+   Same source of truth for the ER value and the ≥50 gate.
+   ============================================================ */
+function computeERAndFloor(posts, followers) {
+  // posts: array of {shares, saves, comments, likes}; followers: number
+  if (!posts || !posts.length || !followers || followers <= 0) {
+    return { er: null, avgWeighted: null };
+  }
+  let sumWeighted = 0;
+  let sumER = 0;
+  let n = 0;
+  for (const p of posts) {
+    const w = (Number(p.shares)||0)*5 + (Number(p.saves)||0)*3 +
+              (Number(p.comments)||0)*2 + (Number(p.likes)||0)*1;
+    sumWeighted += w;
+    sumER += (w / followers) * 100;
+    n++;
+  }
+  return { er: sumER / n, avgWeighted: sumWeighted / n };
+}
+
+/* ============================================================
+   RED FLAGS, read from state, render as chips
+   ============================================================ */
+function computeFlags(state) {
+  const flags = [];
+
+  // 1. Bought/dead audience, provisional
+  const primary = state.social?.primary;
+  if (primary && primary.posts && primary.posts.length && primary.followers > 0) {
+    const { er, avgWeighted } = computeERAndFloor(primary.posts, primary.followers);
+    if (er != null && er < 0.5 && avgWeighted >= 50) {
+      flags.push({
+        id: "bought-dead",
+        text: "Suspicious audience: very low engagement despite active posting suggests the followers may not be real or actively engaged.",
+        provisional: true
+      });
+    }
+  }
+
+  // 2. Invisible to AI, AV11..AV18 all unchecked/false
+  const aeoIds = ["AV11","AV12","AV13","AV14","AV15","AV16","AV17","AV18"];
+  const anyAeo = aeoIds.some(id => state.answers[id] === true || state.answers[id] === "yes");
+  if (!anyAeo) flags.push({ id:"invisible-ai", text:"Not found by AI: the brand's website doesn't answer any of the key questions that AI search engines look for.", provisional:false });
+
+  // 3. Structural SEO ceiling, SV40 unchecked
+  if (state.answers["SV40"] === false || state.answers["SV40"] === "no") {
+    flags.push({ id:"seo-ceiling", text:"Website visibility limited: the brand shares a domain with a parent company, which restricts how Google can rank it independently.", provisional:false });
+  }
+
+  // 4. Wrong-era audience, FB/IG ratio >= 10 AND launch year >= 2020
+  const fb = Number(state.social?.fbFollowers) || 0;
+  const ig = Number(state.social?.igFollowers) || 0;
+  const launchYear = Number(state.meta?.launchYear) || 0;
+  if (ig > 0 && launchYear >= 2020 && (fb / ig) >= 10) {
+    flags.push({ id:"wrong-era", text:"Platform mismatch: a brand launched after 2020 has far more Facebook followers than Instagram, which is the wrong audience mix for today's buyers.", provisional:false });
+  }
+
+  // 5. Absent where buyers decide, RC14 score = 1
+  if (Number(state.answers["RC14"]) === 1) {
+    flags.push({ id:"absent-community", text:"Absent from buyer discussions: the brand doesn't appear in the main community where people in this category make purchasing decisions.", provisional:false });
+  }
+
+  return flags;
+}
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let pendingNextScroll = false;
+let lastDraftMilestone = 0;
+
+const state = {
+  answers: {},                 // criterion id → true/false | "absent"/"sponsored"/"earned" | "1".."5" | [checklist items]
+  flags: { PHYSICAL_LOCATION:true, PHYSICAL_PRODUCT:true, EV_PHEV:true, BOOKABLE_EXPERIENCE:true },
+  flagsTouched: false,         // set when researcher edits flags; guards import fill-blanks rule
+  engineVersions: { ChatGPT:"", Perplexity:"", Gemini:"", Claude:"" },
+  confirmed: { SV:false, AV:false, DE:false, BA:false, SC:false, RC:false },
+  radarVals: { SV:0, AV:0, DE:0, BA:0, SC:0, RC:0 },  // rendered radar values (animate to)
+  collapsed: {},               // subComponent key → true when user has collapsed that section
+  activeTab: "SV",
+  meta: { brand: "", country: "", sector: "", launchYear: "", assessmentDate: new Date().toISOString().slice(0,10) },
+  social: {
+    primary: { platform: "Instagram", followers: 0, posts: [
+      {shares:0,saves:0,comments:0,likes:0},{shares:0,saves:0,comments:0,likes:0},
+      {shares:0,saves:0,comments:0,likes:0},{shares:0,saves:0,comments:0,likes:0},
+      {shares:0,saves:0,comments:0,likes:0},{shares:0,saves:0,comments:0,likes:0},
+      {shares:0,saves:0,comments:0,likes:0},{shares:0,saves:0,comments:0,likes:0},
+      {shares:0,saves:0,comments:0,likes:0},{shares:0,saves:0,comments:0,likes:0}
+    ] },
+    fbFollowers: 0,
+    igFollowers: 0
+  },
+  notes: {}
+};
+
+/* ============================================================
+   RENDER, tabs
+   ============================================================ */
+const DIM_META = [
+  { key:"SV", short:"Search", name:"Search Visibility", time:45,
+    intro:"How easily a customer finds this brand via Google, Maps, and technical search signals." },
+  { key:"AV", short:"AI", name:"AI Visibility", time:90,
+    intro:"Whether the brand appears in AI-generated answers (ChatGPT, Perplexity, Gemini, Claude) and whether its website answers the questions buyers ask AI tools." },
+  { key:"DE", short:"Website", name:"Digital Experience", time:30,
+    intro:"Quality of the brand's website for a buyer researching a purchase: navigation, mobile, forms, and content completeness." },
+  { key:"BA", short:"Authority", name:"Brand Authority", time:45,
+    intro:"Volume and quality of independent third-party credibility signals: press coverage, expert reviews, awards, and backlinks." },
+  { key:"SC", short:"Social", name:"Social & Content", time:45,
+    intro:"Strategic execution and quality of the brand's publishing across social media and content channels." },
+  { key:"RC", short:"Reputation", name:"Reputation & Community", time:60,
+    intro:"What third parties, customers, and communities say about the brand in public, the discourse the brand does not control." }
+];
+
+// A criterion counts as answered when it holds a real value: binary true/false
+// (explicitly evaluated, not untouched), tri-state any of the three, M 1-5,
+// checklist at least one item ticked (empty array scores 0, same as untouched,
+// so it does NOT count). N/A criteria are excluded from both sides of the count.
+function isAnswered(c) {
+  const v = state.answers[c.id];
+  if (c.checklist) return Array.isArray(v) && v.length > 0;
+  if (c.tag === "M") { const s = Number(v); return s >= 1 && s <= 5; }
+  if (c.sponsorable) return v === "absent" || v === "sponsored" || v === "earned";
+  return v === true || v === false || v === "yes" || v === "no" || v === "na";
+}
+
+function progressFor(dim) {
+  let answered = 0, applicable = 0;
+  for (const c of CRITERIA) {
+    if (dim && c.dimension !== dim) continue;
+    if (!isApplicable(c, state.flags)) continue;
+    applicable++;
+    if (isAnswered(c)) answered++;
+  }
+  return { answered, applicable };
+}
+
+function renderTabs() {
+  const nav = document.getElementById("tabs");
+  nav.innerHTML = "";
+  const tabs = [...DIM_META.map(d => ({ key: d.key, label: d.short })), { key:"SUMMARY", label:"Summary" }];
+  for (const t of tabs) {
+    const b = document.createElement("button");
+    const p = t.key === "SUMMARY" ? progressFor(null) : progressFor(t.key);
+    b.innerHTML = `${t.label}<span class="tab-count">${p.answered}/${p.applicable}</span>`;
+    b.className = (state.activeTab === t.key) ? "active" : "";
+    if (t.key !== "SUMMARY") b.setAttribute("data-dim", t.key);
+    b.onclick = () => {
+      state.activeTab = t.key;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      renderAll();
+    };
+    nav.appendChild(b);
+  }
+}
+
+function anchorFor(c, lvl) {
+  // Criterion-specific anchors take priority - required for all -inv criteria.
+  if (c.inlineAnchors && c.inlineAnchors[lvl]) return c.inlineAnchors[lvl];
+  // Formal -inv rule: reverse the base pattern's level order.
+  // 5 always = good/desirable, 1 always = deficient (zero-anchored).
+  const p = PATTERNS[c.pattern];
+  if (!p) return "";
+  if (c.inverted) return p.levels[6 - lvl];
+  return p.levels[lvl];
+}
+
+function progressForSubComp(scName) {
+  let answered = 0, applicable = 0;
+  for (const c of CRITERIA) {
+    if (c.subComponent !== scName) continue;
+    if (!isApplicable(c, state.flags)) continue;
+    applicable++;
+    if (isAnswered(c)) answered++;
+  }
+  return { answered, applicable };
+}
+
+function scrollToNextUnanswered() {
+  if (state.activeTab === "SUMMARY") return;
+  const dim = state.activeTab;
+  const next = CRITERIA.find(c => c.dimension === dim && isApplicable(c, state.flags) && !isAnswered(c));
+  if (!next) return;
+  const el = document.querySelector(`[data-crit-id="${next.id}"]`);
+  if (!el) return;
+  const rect = el.getBoundingClientRect();
+  // Forward-only: only scroll if the next unanswered is below the current view
+  if (rect.top > window.innerHeight * 0.65) {
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}
+
+function showDraftToast(answered) {
+  const existing = document.getElementById("draft-toast");
+  if (existing) existing.remove();
+  const div = document.createElement("div");
+  div.id = "draft-toast";
+  div.className = "draft-toast";
+  div.innerHTML = `<span>You've answered <strong>${answered}</strong> questions. Save a draft so you don't lose your work.</span>
+    <button class="dt-save">Save draft</button>
+    <button class="dt-close" title="Dismiss">&#x2715;</button>`;
+  div.querySelector(".dt-save").onclick = () => { exportJSON(); div.remove(); };
+  div.querySelector(".dt-close").onclick = () => div.remove();
+  document.body.appendChild(div);
+  setTimeout(() => { const el = document.getElementById("draft-toast"); if (el) el.remove(); }, 12000);
+}
+
+function checkDraftPrompt() {
+  const { answered } = progressFor(null);
+  const milestone = Math.floor(answered / 25) * 25;
+  if (milestone >= 25 && milestone > lastDraftMilestone) {
+    lastDraftMilestone = milestone;
+    showDraftToast(answered);
+  }
+}
+
+function renderDimTab(dim) {
+  const meta = DIM_META.find(d => d.key === dim);
+  const wrap = document.createElement("div");
+
+  // Sticky progress bar
+  const { answered: dimAnswered, applicable: dimApplicable } = progressFor(dim);
+  const pct = dimApplicable > 0 ? Math.round(dimAnswered / dimApplicable * 100) : 0;
+  const sticky = document.createElement("div");
+  sticky.className = "dim-sticky";
+  sticky.innerHTML = `<div class="dim-sticky-inner">
+    <span class="dl">Your progress</span>
+    <div class="dbar"><div class="dbar-fill" style="width:${pct}%"></div></div>
+    <span class="dc">${dimAnswered} of ${dimApplicable} done</span>
+    <span class="dt">~${meta.time} min</span>
+  </div>`;
+  wrap.appendChild(sticky);
+
+  const h = document.createElement("h2");
+  h.innerHTML = `<span class="dim-code">${dim}</span>${meta.name}`;
+  wrap.appendChild(h);
+  const intro = document.createElement("div");
+  intro.className = "dim-intro";
+  intro.textContent = meta.intro;
+  wrap.appendChild(intro);
+
+  const legend = document.createElement("div");
+  legend.className = "type-legend";
+  legend.innerHTML = `<span class="leg-item"><b>[A]</b> Quick check &mdash; use a tool or look it up directly</span><span class="leg-item"><b>[S]</b> Spot-check &mdash; brief research + your judgement</span><span class="leg-item"><b>[M]</b> Rate 1&ndash;5 &mdash; pick the level that best fits</span>`;
+  wrap.appendChild(legend);
+
+  // SC dimension: measurement inputs block above criteria
+  if (dim === "SC") wrap.appendChild(renderSCInputs());
+  // AV dimension: clean-session protocol reminder + engine version log
+  if (dim === "AV") wrap.appendChild(renderAVProtocol());
+
+  // Group by sub-component
+  const bySubComp = {};
+  for (const c of CRITERIA) {
+    if (c.dimension !== dim) continue;
+    (bySubComp[c.subComponent] = bySubComp[c.subComponent] || []).push(c);
+  }
+  const model = buildPointsModel(state.flags);
+  for (const [sc, arr] of Object.entries(bySubComp)) {
+    const secKey = dim + "||" + sc;
+    const isCollapsed = !!state.collapsed[secKey];
+    const sec = document.createElement("div");
+    sec.className = "subcomp" + (isCollapsed ? " collapsed" : "");
+
+    // Collapsible header
+    const { answered: scAns, applicable: scApp } = progressForSubComp(sc);
+    const hdr = document.createElement("div"); hdr.className = "subcomp-header";
+    const toggle = document.createElement("button"); toggle.className = "subcomp-toggle";
+    toggle.textContent = "▾"; toggle.setAttribute("aria-label", isCollapsed ? "Expand" : "Collapse");
+    toggle.onclick = (e) => { e.stopPropagation(); state.collapsed[secKey] = !state.collapsed[secKey]; renderAll(); };
+    const h3 = document.createElement("h3"); h3.textContent = sc;
+    const badge = document.createElement("span");
+    badge.className = "sc-badge" + (scApp > 0 && scAns === scApp ? " done" : "");
+    badge.textContent = scApp > 0 ? `${scAns}/${scApp}` : "N/A";
+    hdr.appendChild(toggle); hdr.appendChild(h3); hdr.appendChild(badge);
+    hdr.onclick = () => { state.collapsed[secKey] = !state.collapsed[secKey]; renderAll(); };
+    sec.appendChild(hdr);
+
+    const meta2 = document.createElement("div"); meta2.className = "sc-meta";
+    const applicable = arr.filter(c => isApplicable(c, state.flags));
+    if (applicable.length === 0) {
+      meta2.textContent = `${arr[0].subComponentPoints} pts · entire section not applicable under current settings · points redistributed within ${dim}`;
+    } else {
+      const per = model.ptsOf[applicable[0].id];
+      const naNote = applicable.length < arr.length ? `, ${arr.length - applicable.length} not applicable` : "";
+      meta2.textContent = `${arr[0].subComponentPoints} pts · ${applicable.length} questions${naNote} · ${per.toFixed(2)} pts each`;
+    }
+    sec.appendChild(meta2);
+    for (const c of arr) sec.appendChild(renderCriterion(c));
+    wrap.appendChild(sec);
+  }
+
+  // Confirm row with live dimension score
+  const row = document.createElement("div");
+  row.className = "confirm-row";
+  const live = document.createElement("div");
+  live.className = "live-score";
+  const s = dimensionScore(dim, state);
+  live.innerHTML = s === null ? `n/a<span>not applicable</span>` : `${s.toFixed(1)}<span>/ 100</span>`;
+  row.appendChild(live);
+  const btn = document.createElement("button");
+  btn.className = "confirm";
+  btn.textContent = state.confirmed[dim] ? "Confirm again" : "Confirm section";
+  btn.onclick = () => {
+    state.confirmed[dim] = true;
+    animateRadarAxis(dim, s === null ? 0 : s);
+    renderAll();
+  };
+  row.appendChild(btn);
+  wrap.appendChild(row);
+  return wrap;
+}
+
+function renderCriterion(c) {
+  const el = document.createElement("div");
+  const na = !isApplicable(c, state.flags);
+  el.className = "criterion" + (na ? " na" : "");
+  el.dataset.critId = c.id;
+  const idBox = document.createElement("div"); idBox.className = "crit-id";
+  const patLabel = c.tag === "M"
+    ? `<span class="pat">[M-${c.pattern}${c.inverted?"-inv":""}]</span>`
+    : `<span class="pat">[${c.tag}]</span>`;
+  idBox.innerHTML = `${c.id}<br>${patLabel}` + (na ? `<br><span class="na-badge">N/A</span>` : "");
+  el.appendChild(idBox);
+  const body = document.createElement("div"); body.className = "crit-body";
+  const t = document.createElement("div"); t.className = "crit-text"; t.textContent = c.text; body.appendChild(t);
+  if (na) {
+    const n = document.createElement("div"); n.className = "crit-hint";
+    n.textContent = "Not applicable for this brand type. Automatically skipped.";
+    body.appendChild(n);
+    el.appendChild(body);
+    return el;
+  }
+  if (c.hint) {
+    const h = document.createElement("div"); h.className = "crit-hint"; h.textContent = c.hint; body.appendChild(h);
+  }
+  const ev = document.createElement("div"); ev.className = "crit-ev"; ev.textContent = "Record: " + c.evidence; body.appendChild(ev);
+  body.appendChild(renderInput(c));
+  // Collapsible evidence note
+  const noteWrap = document.createElement("div"); noteWrap.className = "crit-note-wrap";
+  const hasNote = !!(state.notes[c.id]);
+  const noteBtn = document.createElement("button"); noteBtn.className = "crit-note-btn";
+  noteBtn.textContent = hasNote ? "evidence note ▲" : "+ evidence note";
+  const noteArea = document.createElement("div"); noteArea.className = "crit-note-area";
+  noteArea.style.display = hasNote ? "block" : "none";
+  const ta = document.createElement("textarea"); ta.className = "crit-note-ta";
+  ta.placeholder = "Paste a URL, screenshot reference, or brief observation...";
+  ta.value = state.notes[c.id] || "";
+  ta.rows = 2;
+  ta.oninput = e => { state.notes[c.id] = e.target.value; };
+  noteBtn.onclick = () => {
+    const open = noteArea.style.display !== "none";
+    noteArea.style.display = open ? "none" : "block";
+    noteBtn.textContent = open ? (state.notes[c.id] ? "evidence note ▲" : "+ evidence note") : "evidence note ▲";
+    if (!open) ta.focus();
+  };
+  noteArea.appendChild(ta);
+  noteWrap.appendChild(noteBtn);
+  noteWrap.appendChild(noteArea);
+  body.appendChild(noteWrap);
+  el.appendChild(body);
+  return el;
+}
+
+function answer(id, val) {
+  state.answers[id] = val;
+  pendingNextScroll = true;
+  renderAll();
+}
+
+function renderInput(c) {
+  const box = document.createElement("div"); box.className = "crit-input";
+  if (c.checklist) {
+    const wrap = document.createElement("div");
+    wrap.className = "tri";
+    wrap.style.flexWrap = "wrap";
+    const cur = Array.isArray(state.answers[c.id]) ? state.answers[c.id] : [];
+    for (const item of c.checklist) {
+      const lab = document.createElement("label");
+      const inp = document.createElement("input");
+      inp.type = "checkbox";
+      inp.checked = cur.includes(item);
+      inp.onchange = () => {
+        const now = Array.isArray(state.answers[c.id]) ? [...state.answers[c.id]] : [];
+        if (inp.checked) { if (!now.includes(item)) now.push(item); }
+        else { const i = now.indexOf(item); if (i >= 0) now.splice(i, 1); }
+        answer(c.id, now);
+      };
+      lab.appendChild(inp);
+      lab.appendChild(document.createTextNode(" " + item));
+      wrap.appendChild(lab);
+    }
+    box.appendChild(wrap);
+    return box;
+  }
+  if (c.tag === "M") {
+    if (c.inverted) {
+      const invNote = document.createElement("div"); invNote.className = "inv-note";
+      invNote.textContent = "5 = good · 1 = deficient";
+      box.appendChild(invNote);
+    }
+    const grid = document.createElement("div"); grid.className = "m-anchors";
+    for (let lvl = 1; lvl <= 5; lvl++) {
+      const a = document.createElement("div");
+      a.className = "m-anchor" + (String(state.answers[c.id]) === String(lvl) ? " selected" : "");
+      a.innerHTML = `<div class="lvl">${lvl} · ${lvl===1?"0%":lvl===5?"100%":((lvl-1)/4*100)+"%"}</div><div class="anc-text">${anchorFor(c, lvl)}</div>`;
+      a.onclick = () => answer(c.id, String(lvl));
+      grid.appendChild(a);
+    }
+    box.appendChild(grid);
+  } else if (c.sponsorable) {
+    const tri = document.createElement("div"); tri.className = "tri";
+    for (const v of ["absent","sponsored","earned"]) {
+      const lab = document.createElement("label");
+      const inp = document.createElement("input");
+      inp.type = "radio"; inp.name = "tri_" + c.id;
+      inp.checked = (state.answers[c.id] || "absent") === v;
+      inp.onchange = () => answer(c.id, v);
+      lab.appendChild(inp);
+      lab.appendChild(document.createTextNode(" " + v));
+      tri.appendChild(lab);
+    }
+    box.appendChild(tri);
+  } else {
+    const tri = document.createElement("div"); tri.className = "yn-tri";
+    const cur = state.answers[c.id];
+    const curStr = cur === true ? "yes" : cur === false ? "no" : (typeof cur === "string" ? cur : "");
+    for (const [v, label] of [["yes","Yes"],["no","No"],["na","N / A"]]) {
+      const lab = document.createElement("label");
+      if (curStr === v) lab.className = "yn-sel-" + v;
+      const inp = document.createElement("input");
+      inp.type = "radio"; inp.name = "yn_" + c.id; inp.value = v;
+      inp.checked = curStr === v;
+      inp.onchange = () => {
+        answer(c.id, v);
+        tri.querySelectorAll("label").forEach(l => l.className = "");
+        lab.className = "yn-sel-" + v;
+      };
+      lab.appendChild(inp);
+      lab.appendChild(document.createTextNode(" " + label));
+      tri.appendChild(lab);
+    }
+    box.appendChild(tri);
+  }
+  return box;
+}
+
+function renderAVProtocol() {
+  const box = document.createElement("div");
+  box.className = "sc-inputs";
+  box.innerHTML = `<h3>AI Testing Protocol</h3>
+    <div class="note">Run every prompt in a logged-out or fresh browser session. If you get different answers across runs, score the majority result. Log the session details below; they save into your export file.</div>
+    <dl class="av-defs">
+      <dt>Web search on or off</dt><dd>Some AI tools can browse the internet live; others answer from their training data only. Note which mode you used and keep it the same for all prompts in this session.</dd>
+      <dt>Language and region</dt><dd>The language and country your browser was set to during testing (e.g. English, Sri Lanka). Set this explicitly before running prompts; AI answers can vary by region.</dd>
+      <dt>Number of test runs</dt><dd>How many times you sent the same prompt to this AI tool. Run it 2-3 times and score the answer that came up most often; a single run can produce an unusual result.</dd>
+    </dl>`;
+  for (const engine of Object.keys(state.engineVersions)) {
+    const lab = document.createElement("label");
+    lab.style.cssText = "display:flex;flex-direction:column;font-size:12px;color:var(--muted);margin-bottom:8px;";
+    lab.textContent = engine + " - session notes (e.g. model version, search on/off, language+region, number of runs, date)";
+    const inp = document.createElement("input");
+    inp.style.cssText = "margin-top:3px;padding:6px 8px;border:1px solid var(--line);font-family:inherit;font-size:13px;";
+    inp.value = state.engineVersions[engine];
+    inp.placeholder = "e.g. GPT-5.2, search on, en-LK, 3 runs, 2026-07-08";
+    inp.oninput = e => { state.engineVersions[engine] = e.target.value; };
+    lab.appendChild(inp);
+    box.appendChild(lab);
+  }
+  return box;
+}
+
+function renderSCInputs() {
+  const box = document.createElement("div"); box.className = "sc-inputs";
+  const h = document.createElement("h3"); h.textContent = "Social media numbers (last 10 posts)";
+  box.appendChild(h);
+  const note = document.createElement("div"); note.className = "note";
+  note.textContent = "Select the primary platform and enter follower counts. The engagement rate uses the primary platform's followers automatically.";
+  box.appendChild(note);
+
+  // Primary platform block
+  const platWrap = document.createElement("div");
+  platWrap.innerHTML = `<div style="margin:8px 0 4px 0;font-size:12px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">Primary platform · last 10 posts</div>`;
+
+  const platRow = document.createElement("div");
+  platRow.style.cssText = "display:flex;gap:16px;align-items:end;margin-bottom:10px;flex-wrap:wrap;";
+
+  const _platforms = ["Instagram","Facebook","TikTok","YouTube","LinkedIn","X / Twitter"];
+  const _plat = state.social.primary.platform || "Instagram";
+  const _isOther = !["Instagram","Facebook"].includes(_plat);
+  const _iStyle = "padding:6px 8px;border:1px solid var(--line);font-family:inherit;font-size:13px;background:var(--bg-2);color:var(--fg);border-radius:var(--r-sm);";
+  const _opts = _platforms.map(p => `<option value="${p}"${p===_plat?" selected":""}>${p}</option>`).join("");
+
+  platRow.innerHTML = `
+    <label style="display:flex;flex-direction:column;font-size:12px;color:var(--muted);">primary platform
+      <select id="sc_platform" style="${_iStyle}min-width:130px;">${_opts}</select>
+    </label>
+    <label style="display:flex;flex-direction:column;font-size:12px;color:var(--muted);">Instagram followers
+      <input id="sc_ig" type="number" min="0" value="${state.social.igFollowers}" style="${_iStyle}width:130px;">
+    </label>
+    <label style="display:flex;flex-direction:column;font-size:12px;color:var(--muted);">Facebook followers
+      <input id="sc_fb" type="number" min="0" value="${state.social.fbFollowers}" style="${_iStyle}width:130px;">
+    </label>
+    ${_isOther ? `<label style="display:flex;flex-direction:column;font-size:12px;color:var(--muted);">${_plat} followers
+      <input id="sc_primary_followers" type="number" min="0" value="${state.social.primary.followers}" style="${_iStyle}width:130px;">
+    </label>` : ""}
+  `;
+  platWrap.appendChild(platRow);
+
+  // Primary followers for ER: IG if primary=Instagram, FB if primary=Facebook, otherwise state.social.primary.followers
+  const _primaryFollowers = _plat === "Instagram" ? (state.social.igFollowers || 0)
+    : _plat === "Facebook" ? (state.social.fbFollowers || 0)
+    : (state.social.primary.followers || 0);
+
+  const header = document.createElement("div");
+  header.className = "platform-row header";
+  header.innerHTML = "<div>Post #</div><div>shares</div><div>saves</div><div>comments</div><div>likes</div><div>weighted</div><div>ER %</div>";
+  platWrap.appendChild(header);
+  for (let i = 0; i < 10; i++) {
+    const r = document.createElement("div"); r.className = "platform-row";
+    const w = (Number(state.social.primary.posts[i].shares)||0)*5 + (Number(state.social.primary.posts[i].saves)||0)*3 +
+              (Number(state.social.primary.posts[i].comments)||0)*2 + (Number(state.social.primary.posts[i].likes)||0)*1;
+    const er = _primaryFollowers > 0 ? (w / _primaryFollowers * 100).toFixed(3) : "–";
+    r.innerHTML = `
+      <div>post ${i+1}</div>
+      <div><input type="number" min="0" data-post="${i}" data-field="shares" value="${state.social.primary.posts[i].shares}"></div>
+      <div><input type="number" min="0" data-post="${i}" data-field="saves" value="${state.social.primary.posts[i].saves}"></div>
+      <div><input type="number" min="0" data-post="${i}" data-field="comments" value="${state.social.primary.posts[i].comments}"></div>
+      <div><input type="number" min="0" data-post="${i}" data-field="likes" value="${state.social.primary.posts[i].likes}"></div>
+      <div style="color:var(--muted);">${w}</div>
+      <div style="color:var(--muted);">${er}</div>
+    `;
+    platWrap.appendChild(r);
+  }
+  box.appendChild(platWrap);
+
+  const readout = document.createElement("div");
+  readout.className = "er-readout";
+  const { er, avgWeighted } = computeERAndFloor(state.social.primary.posts, _primaryFollowers);
+  readout.innerHTML = `
+    <div><div class="label">weighted ER</div><div class="val">${er==null?"–":er.toFixed(2)+"%"}</div></div>
+    <div><div class="label">avg weighted / post</div><div class="val">${avgWeighted==null?"–":avgWeighted.toFixed(1)}</div></div>
+    <div><div class="label">FB : IG ratio</div><div class="val">${state.social.igFollowers>0?(state.social.fbFollowers/state.social.igFollowers).toFixed(2):"–"}</div></div>
+  `;
+  box.appendChild(readout);
+
+  // Wire inputs
+  setTimeout(() => {
+    const p = document.getElementById("sc_platform");
+    if (p) p.onchange = e => { state.social.primary.platform = e.target.value; renderAll(); };
+    const ig = document.getElementById("sc_ig");
+    if (ig) ig.oninput = e => { state.social.igFollowers = Number(e.target.value)||0; renderAll(); };
+    const fb = document.getElementById("sc_fb");
+    if (fb) fb.oninput = e => { state.social.fbFollowers = Number(e.target.value)||0; renderAll(); };
+    const pf = document.getElementById("sc_primary_followers");
+    if (pf) pf.oninput = e => { state.social.primary.followers = Number(e.target.value)||0; renderAll(); };
+    for (const inp of box.querySelectorAll("input[data-post]")) {
+      inp.oninput = e => {
+        const i = Number(e.target.dataset.post);
+        const f = e.target.dataset.field;
+        state.social.primary.posts[i][f] = Number(e.target.value)||0;
+        renderAll();
+      };
+    }
+  }, 0);
+
+  return box;
+}
+
+/* ============================================================
+   RADAR (hand-drawn SVG, 6 axes, animation on confirm)
+   ============================================================ */
+const RADAR_DIMS = ["SV","AV","DE","BA","SC","RC"];
+
+function renderRadar(size, dark) {
+  const s = size || 240;
+  const cx = s/2, cy = s/2;
+  const r = s * 0.42;
+  const gridLevels = [20, 40, 60, 80, 100];
+  const angleFor = i => (Math.PI * 2 * i / RADAR_DIMS.length) - Math.PI/2;
+  const pad = 30;
+  // Color scheme based on dark/light context
+  const gridOuter = dark ? "#2e2e2e" : "#d8d8d8";
+  const gridInner = dark ? "#222" : "#ececec";
+  const axisColor = dark ? "#2a2a2a" : "#d0d0d0";
+  const labelColor = dark ? "#888" : "#1e1e1e";
+  const naColor = dark ? "#444" : "#9a9a9a";
+  const ringLabelColor = dark ? "#444" : "#b8b8b8";
+  const dotHalo = dark ? "#161616" : "#ffffff";
+  let svg = `<svg width="${s + pad*2}" height="${s + pad*2}" viewBox="${-pad} ${-pad} ${s + pad*2} ${s + pad*2}" xmlns="http://www.w3.org/2000/svg">`;
+  // Concentric gridlines
+  for (const g of gridLevels) {
+    const pts = RADAR_DIMS.map((_, i) => {
+      const rad = r * (g / 100);
+      const a = angleFor(i);
+      return (cx + Math.cos(a)*rad).toFixed(1) + "," + (cy + Math.sin(a)*rad).toFixed(1);
+    }).join(" ");
+    const isOuter = g === 100;
+    svg += `<polygon points="${pts}" fill="${isOuter ? (dark?"#1e1e1e":"#f5f5f5") : "none"}" stroke="${isOuter ? gridOuter : gridInner}" stroke-width="${isOuter ? "1" : "0.8"}"/>`;
+    // Ring percentage label on the bottom-right axis (between axis 0 and 1)
+    if (g < 100) {
+      const labelA = angleFor(0) + (Math.PI * 2 / RADAR_DIMS.length) * 0.5;
+      const lrad = r * (g / 100);
+      const lx = cx + Math.cos(labelA) * lrad, ly = cy + Math.sin(labelA) * lrad;
+      svg += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="${ringLabelColor}">${g}</text>`;
+    }
+  }
+  // Axes
+  for (let i = 0; i < RADAR_DIMS.length; i++) {
+    const a = angleFor(i);
+    const x2 = cx + Math.cos(a)*r, y2 = cy + Math.sin(a)*r;
+    svg += `<line x1="${cx}" y1="${cy}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${axisColor}" stroke-width="0.8"/>`;
+    const applicable = buildPointsModel(state.flags).dimApplicable[RADAR_DIMS[i]];
+    const lx = cx + Math.cos(a)*(r+18), ly = cy + Math.sin(a)*(r+18);
+    const label = applicable ? RADAR_DIMS[i] : RADAR_DIMS[i] + " n/a";
+    const fill = applicable ? labelColor : naColor;
+    svg += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="${fill}" font-weight="600" letter-spacing="1">${label}</text>`;
+  }
+  // Data polygon
+  const pts = RADAR_DIMS.map((d, i) => {
+    const v = state.radarVals[d];
+    const rad = r * (v / 100);
+    const a = angleFor(i);
+    return (cx + Math.cos(a)*rad).toFixed(1) + "," + (cy + Math.sin(a)*rad).toFixed(1);
+  }).join(" ");
+  svg += `<polygon points="${pts}" fill="#e28f26" fill-opacity="0.22" stroke="#e28f26" stroke-width="2.5"/>`;
+  // Data dots with halo
+  for (let i = 0; i < RADAR_DIMS.length; i++) {
+    const v = state.radarVals[RADAR_DIMS[i]];
+    if (v === 0) continue;
+    const rad = r * (v / 100);
+    const a = angleFor(i);
+    const px = cx + Math.cos(a)*rad, py = cy + Math.sin(a)*rad;
+    svg += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="5" fill="${dotHalo}"/>`;
+    svg += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3.5" fill="#e28f26"/>`;
+  }
+  svg += "</svg>";
+  return svg;
+}
+
+function animateRadarAxis(dim, target) {
+  const start = state.radarVals[dim];
+  const t0 = performance.now();
+  const dur = 260;
+  function step(now) {
+    const p = Math.min(1, (now - t0) / dur);
+    const eased = 1 - Math.pow(1 - p, 3);
+    state.radarVals[dim] = start + (target - start) * eased;
+    // Only re-render the radar rail (cheap), not the whole panel
+    const rail = document.getElementById("rail");
+    if (rail) rail.innerHTML = radarRailHTML();
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* ============================================================
+   RADAR RAIL (sticky sidebar summary)
+   ============================================================ */
+function scoreRingSVG(value, size, dark) {
+  const arcR = size * 0.39;
+  const circ = 2 * Math.PI * arcR;
+  const pct = Math.min(Math.max(value, 0), 100) / 100;
+  const dash = circ * pct;
+  const gap = circ - dash;
+  const offset = circ * 0.25;
+  const fg = dark ? "#ffffff" : "#1e1e1e";
+  const sub = dark ? "#555" : "#9a9a9a";
+  const track = dark ? "#2a2a2a" : "#ececec";
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="${size/2}" cy="${size/2}" r="${arcR}" fill="none" stroke="${track}" stroke-width="${size*0.065}"/>
+    <circle cx="${size/2}" cy="${size/2}" r="${arcR}" fill="none" stroke="#e28f26" stroke-width="${size*0.065}"
+      stroke-dasharray="${dash.toFixed(2)} ${gap.toFixed(2)}"
+      stroke-dashoffset="${offset.toFixed(2)}" stroke-linecap="round"/>
+    <text x="${size/2}" y="${size/2 - size*0.06}" text-anchor="middle" dominant-baseline="middle"
+      font-size="${size*0.2}" font-weight="600" fill="${fg}" font-family="Roboto,system-ui,sans-serif">${value.toFixed(1)}</text>
+    <text x="${size/2}" y="${size/2 + size*0.12}" text-anchor="middle" dominant-baseline="middle"
+      font-size="${size*0.09}" fill="${sub}" letter-spacing="1" font-family="Roboto,system-ui,sans-serif">/ 100</text>
+  </svg>`;
+}
+
+function radarRailHTML() {
+  const dims = RADAR_DIMS.map(d => {
+    const s = dimensionScore(d, state);
+    const conf = state.confirmed[d];
+    return { d, s, conf };
+  });
+  const comp = composite(state);
+  const band = maturityBand(comp);
+  return `
+    <div class="radar-card">
+      <h4>Composite VISTA score</h4>
+      <div style="display:flex;justify-content:center;margin:8px 0 4px 0;">${scoreRingSVG(comp, 120, true)}</div>
+      <div style="text-align:center;">${`<span class="band ${band.cls}">${band.label}</span>`}</div>
+      <div style="margin-top:16px;display:flex;justify-content:center;">${renderRadar(220, true)}</div>
+      <ul class="dim-list">
+        ${dims.map(x => { const m = DIM_META.find(d=>d.key===x.d); return `<li class="${x.conf?"confirmed":""}"><span>${x.d} · ${m?m.short:x.d}</span><span class="val">${x.s===null?"n/a":(x.conf?x.s.toFixed(1):"–")}</span></li>`; }).join("")}
+      </ul>
+    </div>
+  `;
+}
+
+/* ============================================================
+   SUMMARY tab
+   ============================================================ */
+function renderSummary() {
+  const wrap = document.createElement("div");
+  const head = document.createElement("div"); head.className = "summary-header";
+  const h = document.createElement("h2");
+  h.innerHTML = `<span class="dim-code">Σ</span>Summary & export`;
+  head.appendChild(h);
+  const actions = document.createElement("div"); actions.className = "actions";
+  const eBtn = document.createElement("button"); eBtn.className = "ghost"; eBtn.textContent = "Export JSON";
+  eBtn.onclick = exportJSON;
+  const iBtn = document.createElement("button"); iBtn.className = "ghost"; iBtn.textContent = "Import JSON";
+  iBtn.onclick = () => document.getElementById("importFile").click();
+  const pBtn = document.createElement("button"); pBtn.className = "ghost"; pBtn.textContent = "Print / PDF";
+  pBtn.onclick = () => window.print();
+  actions.appendChild(eBtn); actions.appendChild(iBtn); actions.appendChild(pBtn);
+  const importNote = document.createElement("div"); importNote.className = "import-note";
+  importNote.textContent = "Import a .json file previously exported from this tool to resume or merge an earlier session.";
+  actions.appendChild(importNote);
+  head.appendChild(actions);
+  wrap.appendChild(head);
+
+  // Metadata block
+  const metaBox = document.createElement("div");
+  metaBox.className = "sc-inputs";
+  metaBox.innerHTML = `<h3>About this brand</h3>
+    <div class="note">Fill this in before you start. It saves with your results and helps identify the report.</div>`;
+  const grid = document.createElement("div"); grid.className = "meta-grid";
+  const fields = [
+    { key:"brand", label:"brand name" },
+    { key:"country", label:"country" },
+    { key:"sector", label:"sector" },
+    { key:"launchYear", label:"brand launch year", type:"number" },
+    { key:"assessmentDate", label:"assessment date", type:"date" }
+  ];
+  for (const f of fields) {
+    const l = document.createElement("label");
+    l.textContent = f.label;
+    const inp = document.createElement("input");
+    inp.type = f.type || "text";
+    inp.value = state.meta[f.key] || "";
+    inp.oninput = e => { state.meta[f.key] = e.target.value; renderAll(); };
+    l.appendChild(inp);
+    grid.appendChild(l);
+  }
+  metaBox.appendChild(grid);
+  wrap.appendChild(metaBox);
+
+  // Sector applicability flags (published rules, applicability-rules.md).
+  // Set once per assessment. Turning a flag off marks its criteria N/A and
+  // renormalizes points. Blocked if fewer than 4 dimensions would remain applicable.
+  const sectorFlagBox = document.createElement("div");
+  sectorFlagBox.className = "sc-inputs";
+  sectorFlagBox.innerHTML = `<h3>Which of these apply to this brand?</h3>
+    <div class="note">Tick only what is true for this brand. Questions that don't apply will be skipped automatically and won't count against the score.</div>`;
+  const fGrid = document.createElement("div");
+  fGrid.className = "flags-grid";
+  const errSlot = document.createElement("div");
+  for (const [flag, def] of Object.entries(APPLICABILITY_FLAGS)) {
+    const lab = document.createElement("label");
+    const inp = document.createElement("input");
+    inp.type = "checkbox";
+    inp.checked = !!state.flags[flag];
+    inp.onchange = () => {
+      const proposed = { ...state.flags, [flag]: inp.checked };
+      const applDims = Object.values(buildPointsModel(proposed).dimApplicable).filter(Boolean).length;
+      if (applDims < 4) {
+        inp.checked = !inp.checked;  // revert
+        errSlot.innerHTML = `<div class="flag-error">Cannot disable: this combination would leave only ${applDims} sections active. At least 4 sections must apply.</div>`;
+        return;
+      }
+      errSlot.innerHTML = "";
+      state.flags = proposed;
+      state.flagsTouched = true;
+      renderAll();
+    };
+    lab.appendChild(inp);
+    const span = document.createElement("span");
+    span.innerHTML = `<strong>${FLAG_DISPLAY[flag]}</strong><br><span class="flag-def">${def}</span>`;
+    lab.appendChild(span);
+    fGrid.appendChild(lab);
+  }
+  sectorFlagBox.appendChild(fGrid);
+  sectorFlagBox.appendChild(errSlot);
+  wrap.appendChild(sectorFlagBox);
+
+  // Big radar + composite
+  const comp = composite(state);
+  const band = maturityBand(comp);
+  const bigCard = document.createElement("div");
+  bigCard.className = "summary-score-card";
+  bigCard.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;">
+      <div>
+        <h4>Composite VISTA score</h4>
+        <div style="margin:12px 0 4px 0;">${scoreRingSVG(comp, 180, true)}</div>
+        <div style="margin-top:4px;"><span class="band ${band.cls}" style="font-size:12px;letter-spacing:3px;padding:5px 14px;">${band.label}</span></div>
+        <ul class="dim-list" style="margin-top:24px;">
+          ${RADAR_DIMS.map(d => {
+            const s = dimensionScore(d, state);
+            const val = s === null ? "n/a" : `${s.toFixed(1)}${state.confirmed[d]?"":" *"}`;
+            const short = DIM_META.find(x=>x.key===d)?.short || d;
+            return `<li class="${state.confirmed[d]?"confirmed":""}"><span>${d} · ${short}</span><span class="val">${val}</span></li>`;
+          }).join("")}
+        </ul>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;">* Score not yet confirmed. Go to that tab and click "Confirm section" to lock it in before exporting.</div>
+      </div>
+      <div style="display:flex;justify-content:center;">${renderRadar(360, true)}</div>
+    </div>
+  `;
+  wrap.appendChild(bigCard);
+
+  // Red flags
+  const flags = computeFlags(state);
+  const flagBox = document.createElement("div"); flagBox.className = "flags";
+  flagBox.innerHTML = `<h4>Warning signals <span style="font-weight:400;letter-spacing:0;text-transform:none;font-size:11px;color:var(--muted);">· shown separately, not deducted from the score</span></h4>`;
+  if (!flags.length) {
+    const e = document.createElement("div"); e.className = "empty-flags";
+    e.textContent = "All clear. No warning signals detected.";
+    flagBox.appendChild(e);
+  } else {
+    for (const f of flags) {
+      const c = document.createElement("div");
+      c.className = "flag-chip" + (f.provisional ? " provisional" : "");
+      c.textContent = f.text;
+      flagBox.appendChild(c);
+    }
+  }
+  wrap.appendChild(flagBox);
+
+  // Focus areas: bottom-scoring confirmed dimensions
+  const scored = RADAR_DIMS
+    .map(d => ({ d, s: dimensionScore(d, state), confirmed: state.confirmed[d] }))
+    .filter(x => x.s !== null)
+    .sort((a, b) => a.s - b.s);
+  if (scored.length > 0) {
+    const focusBox = document.createElement("div"); focusBox.className = "focus-box";
+    focusBox.innerHTML = `<h4>Where to focus next <span style="font-weight:400;letter-spacing:0;text-transform:none;font-size:11px;color:var(--muted);">· lowest-scoring dimensions</span></h4>`;
+    const list = document.createElement("ul"); list.className = "focus-list";
+    const top3 = scored.slice(0, Math.min(3, scored.length));
+    for (const { d, s, confirmed } of top3) {
+      const meta = DIM_META.find(x => x.key === d);
+      const prog = progressFor(d);
+      const li = document.createElement("li");
+      const gap = prog.applicable - prog.answered;
+      li.innerHTML = `<span class="focus-dim">${d} · ${meta?.short || d}</span>
+        <span class="focus-score">${s.toFixed(1)}<span class="focus-max"> / 100</span></span>
+        <span class="focus-note">${gap > 0 ? `${gap} unanswered` : confirmed ? "complete" : "not confirmed"}</span>`;
+      list.appendChild(li);
+    }
+    focusBox.appendChild(list);
+    wrap.appendChild(focusBox);
+  }
+
+  // Sector percentile, phase 2 stub
+  const pctBox = document.createElement("div"); pctBox.style.marginTop = "24px";
+  pctBox.innerHTML = `<h4 style="margin:0 0 6px 0;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:500;">How this brand compares</h4>
+    <div style="font-size:12px;color:var(--muted);font-style:italic;">Available once 5 or more brands in this sector have been assessed.</div>`;
+  wrap.appendChild(pctBox);
+
+  const authorLine = document.createElement("div");
+  authorLine.style.cssText = "margin-top:32px;font-size:11px;color:var(--muted);letter-spacing:0.5px;";
+  authorLine.textContent = "Methodology authored by Adhit Satish.";
+  wrap.appendChild(authorLine);
+
+  return wrap;
+}
+
+/* ============================================================
+   EXPORT / IMPORT
+   ============================================================ */
+function exportJSON() {
+  const dims = {};
+  for (const d of RADAR_DIMS) dims[d] = { score: dimensionScore(d, state), confirmed: state.confirmed[d] };
+  const payload = {
+    schema: "vista-v1.1",
+    buildId: BUILD_ID,
+    exportedAt: new Date().toISOString(),
+    meta: state.meta,
+    applicabilityFlags: state.flags,
+    engineVersions: state.engineVersions,
+    social: state.social,
+    answers: state.answers,
+    notes: state.notes,
+    dimensions: dims,
+    composite: composite(state),
+    maturityBand: maturityBand(composite(state)).label,
+    flags: computeFlags(state)
+  };
+  const brand = (state.meta.brand || "brand").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const date = state.meta.assessmentDate || new Date().toISOString().slice(0,10);
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = `${brand}-${date}.json`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function wireImport() {
+  const inp = document.getElementById("importFile");
+  inp.onchange = e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => {
+      try {
+        const p = JSON.parse(rd.result);
+        // Shallow-merge, current state wins. A criterion already answered in
+        // this session is never overwritten by an import; the discarded
+        // import value is logged so the researcher can see what did not land.
+        if (p.answers) {
+          for (const [cid, val] of Object.entries(p.answers)) {
+            const crit = CRITERIA.find(c => c.id === cid);
+            if (!crit) { console.warn(`import skipped for ${cid}, unknown criterion`); continue; }
+            if (isAnswered(crit)) {
+              console.info(`import skipped for ${cid}, existing state value = ${JSON.stringify(state.answers[cid])}`);
+              continue;
+            }
+            state.answers[cid] = val;
+          }
+        }
+        // Metadata and SC inputs: existing populated values win, imports fill blanks only.
+        if (p.meta) {
+          for (const [k, v] of Object.entries(p.meta)) {
+            if (state.meta[k] === "" || state.meta[k] == null) state.meta[k] = v;
+            else if (v !== state.meta[k]) console.info(`import skipped for meta.${k}, existing value kept`);
+          }
+        }
+        if (p.social) {
+          const cur = state.social;
+          const scEmpty = cur.primary.followers === 0 && cur.igFollowers === 0 && cur.fbFollowers === 0 &&
+            cur.primary.posts.every(x => !x.shares && !x.saves && !x.comments && !x.likes);
+          if (scEmpty) state.social = { ...cur, ...p.social };
+          else console.info("import skipped for SC inputs, existing values kept");
+        }
+        if (p.applicabilityFlags) {
+          if (!state.flagsTouched) state.flags = { ...state.flags, ...p.applicabilityFlags };
+          else console.info("import skipped for applicability flags, existing values kept");
+        }
+        if (p.engineVersions) {
+          for (const [k, v] of Object.entries(p.engineVersions)) {
+            if (!state.engineVersions[k]) state.engineVersions[k] = v;
+          }
+        }
+        // Notes: import fills blanks only, existing notes are not overwritten
+        if (p.notes) {
+          for (const [cid, note] of Object.entries(p.notes)) {
+            if (!state.notes[cid]) state.notes[cid] = note;
+          }
+        }
+        if (p.dimensions) {
+          for (const d of RADAR_DIMS) {
+            state.confirmed[d] = state.confirmed[d] || !!p.dimensions[d]?.confirmed;
+            const s = dimensionScore(d, state);
+            state.radarVals[d] = state.confirmed[d] && s !== null ? s : 0;
+          }
+        }
+        renderAll();
+      } catch (err) {
+        alert("Import failed: " + err.message);
+      }
+    };
+    rd.readAsText(f);
+    inp.value = ""; // allow re-import of the same filename
+  };
+}
+
+/* ============================================================
+   RENDER ORCHESTRATOR
+   ============================================================ */
+function renderAll() {
+  renderTabs();
+  const panel = document.getElementById("panel");
+  const rail = document.getElementById("rail");
+  const main = document.getElementById("main");
+  panel.innerHTML = "";
+  if (state.activeTab === "SUMMARY") {
+    main.classList.add("summary-view");
+    rail.style.display = "none";
+    panel.appendChild(renderSummary());
+  } else {
+    main.classList.remove("summary-view");
+    rail.style.display = "";
+    panel.appendChild(renderDimTab(state.activeTab));
+    rail.innerHTML = radarRailHTML();
+  }
+  if (pendingNextScroll) {
+    pendingNextScroll = false;
+    setTimeout(scrollToNextUnanswered, 60);
+  }
+  checkDraftPrompt();
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+(function boot() {
+  const errs = runAssertions();
+  const statusEl = document.getElementById("assert-status");
+  if (errs.length) {
+    statusEl.textContent = "ASSERTION FAILURE, refusing to render";
+    statusEl.style.color = "#b04e00";
+    console.error("VISTA assertion failure:", errs);
+    document.getElementById("main").innerHTML =
+      `<section class="panel"><h2>Refusing to render</h2>
+       <p>The inlined criteria failed count / point-reconciliation checks:</p>
+       <ul>${errs.map(e => `<li>${e}</li>`).join("")}</ul>
+       <p>Fix the data before continuing.</p></section>`;
+    return;
+  }
+  statusEl.textContent = "195 criteria · 49/27/38/26/28/27 ✓";
+  console.info("VISTA v1.1. Methodology and instrument authored by Adhit Satish.");
+  wireImport();
+  window.addEventListener("beforeunload", e => {
+    if (progressFor(null).answered > 0) {
+      e.preventDefault();
+      return e.returnValue = "You have unsaved answers. Export your progress as JSON before closing.";
+    }
+  });
+  renderAll();
+})();
+
+/* --- optional external-load helper stub (unused by default) --------
+async function loadExternal() {
+  const c = await fetch('./criteria.json').then(r => r.json());
+  const p = await fetch('./patterns.json').then(r => r.json());
+  // wire c/p into module-level CRITERIA / PATTERNS if ever needed
+}
+------------------------------------------------------------------- */
+</script>
