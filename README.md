@@ -106,7 +106,7 @@ This software may be viewed and evaluated for personal, non-commercial purposes.
 Commercial use, redistribution, and derivative works require written permission.  
 See [LICENSE](LICENSE) for full terms.
 
-For licensing: adhitsatish903@gmail.com
+For licensing: adhitsatish@gmail.com
 
 ---
 
