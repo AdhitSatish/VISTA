@@ -1396,33 +1396,87 @@ main.summary-view section.panel {
   main.summary-view section.panel { padding: 20px 16px 60px; }
 }
 
-/* ---- SUMMARY TOP ROW (hero beside data grid) ---- */
+/* ---- SUMMARY UNIFIED BOX ---- */
 .summary-top {
   display: flex;
-  gap: 20px;
-  align-items: start;
+  gap: 0;
+  align-items: stretch;
   margin-bottom: 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  overflow: hidden;
 }
+/* Score column */
 .summary-top .summary-hero {
-  flex: 0 0 380px;
-  padding: 40px 28px 36px;
+  flex: 0 0 320px;
+  padding: 36px 20px 32px;
   margin-bottom: 0;
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--line);
+  border-radius: 0;
+  overflow: visible;
 }
+.summary-top .summary-hero-glow,
+.summary-top .summary-hero-glow-floor { display: none; }
+.summary-top .summary-hero-ring svg { max-width: 100%; height: auto; }
+.summary-top .summary-hero-subtitle { display: none; }
+/* Radar + dim wrapper */
 .summary-top .summary-data-grid {
   flex: 1;
+  display: flex;
   min-width: 0;
   margin-bottom: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  gap: 0;
+  align-items: stretch;
 }
-@media (max-width: 1100px) {
-  .summary-top { flex-direction: column; }
-  .summary-top .summary-hero { flex: none; width: 100%; padding: 40px 24px 36px; }
+/* Radar column */
+.summary-top .summary-radar-panel {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  border-right: 1px solid var(--line);
+  justify-content: center;
+}
+.summary-top .summary-radar-panel svg { max-width: 100%; height: auto; }
+/* Dimension cards column */
+.summary-top .summary-dim-panel {
+  flex: 0 0 300px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 24px 16px;
+}
+.summary-top .dim-stat-name {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  font-size: 9px;
+}
+/* Responsive: stack vertically below 960px */
+@media (max-width: 960px) {
+  .summary-top { flex-direction: column; overflow: visible; }
+  .summary-top .summary-hero {
+    flex: none; width: 100%; border-right: none;
+    border-bottom: 1px solid var(--line); padding: 36px 24px 32px;
+  }
+  .summary-top .summary-data-grid { flex-direction: column; }
+  .summary-top .summary-radar-panel { border-right: none; border-bottom: 1px solid var(--line); }
+  .summary-top .summary-dim-panel { flex: none; width: 100%; padding: 24px 20px; }
 }
 </style>
 
 <header>
   <div class="header-brand">
     <div class="header-logo"><em>VISTA</em> Calculator</div>
-    <div class="header-sub">Visibility Intelligence &amp; Strategic Trust Assessment &middot; V.02.02.00</div>
+    <div class="header-sub">Visibility Intelligence &amp; Strategic Trust Assessment &middot; V.02.02.01</div>
   </div>
   <div class="header-status" id="assert-status">loading&hellip;</div>
 </header>
@@ -2997,7 +3051,7 @@ function exportJSON() {
   const dims = {};
   for (const d of RADAR_DIMS) dims[d] = { score: dimensionScore(d, state), confirmed: state.confirmed[d] };
   const payload = {
-    schema: "vista-v2.2.0",
+    schema: "vista-v2.2.1",
     buildId: BUILD_ID,
     exportedAt: new Date().toISOString(),
     meta: state.meta,
@@ -3119,7 +3173,7 @@ function renderAll() {
     return;
   }
   statusEl.textContent = "195 criteria · 49/27/38/26/28/27 ✓";
-  console.info("VISTA V.02.02.00. Methodology and instrument authored by Adhit Satish.");
+  console.info("VISTA V.02.02.01. Methodology and instrument authored by Adhit Satish.");
   wireImport();
   window.addEventListener("beforeunload", e => {
     if (progressFor(null).answered > 0) {

@@ -1,5 +1,13 @@
 # VISTA Calculator Changelog
 
+## V.02.02.01 -- Summary Unified Box (2026-07-13)
+
+**What changed:** Replaced the three separate floating cards in the summary (score ring, radar, dimension scores) with a single unified container. All three sections now sit inside one card with thin vertical dividers between them. No individual card backgrounds, borders, or border radii on the sections themselves. The atmospheric glow behind the score ring is hidden in this context (it was designed for a full-width hero, not a narrow column). The dimension score card names now wrap instead of truncating with an ellipsis. The radar SVG scales responsively via CSS max-width so it does not overflow its column. Responsive: stacks vertically below 960px with horizontal dividers between sections.
+
+**Files changed:** index.html (root, serves GitHub Pages), 03_Calculator/index.html (source)
+
+---
+
 ## V.02.02.00 -- Input UX + Summary Layout (2026-07-13)
 
 **What changed:** Three UX fixes to eliminate input friction and reduce wasted space in the Summary.
