@@ -2,8 +2,10 @@
 
 > A deterministic, outside-in digital brand audit framework. 195 criteria. Zero AI in the scoring loop. Same inputs, same output, every time.
 
-**Author:** Adhit Satish | **Version:** v1.1 | **Built:** 2026  
+**Author:** Adhit Satish | **Version:** V.02.02.02 | **Built:** 2026  
 **Contact:** adhitsatish@gmail.com
+
+VISTA is free. Use it, share it, adapt it. It exists to reduce the workload of doing a proper digital brand audit, not to gatekeep a methodology. If you find it useful, that is enough.
 
 ---
 
@@ -57,7 +59,7 @@ A single HTML file. No dependencies. No build step. Runs offline by double-click
 ```
 VISTA/
   00_README.md              Framework overview and locked decisions
-  LICENSE                   Proprietary source-available license
+  LICENSE                   MIT License
   01_Framework/             
     _INDEX.md               Read order and session context
     dimensions.md           6-dimension overview and attribution rule
@@ -101,12 +103,9 @@ VISTA/
 
 ## License
 
-**Source Available - All Rights Reserved.**  
-This software may be viewed and evaluated for personal, non-commercial purposes.  
-Commercial use, redistribution, and derivative works require written permission.  
-See [LICENSE](LICENSE) for full terms.
+**MIT License.** Free to use, modify, and distribute. No permission needed.
 
-For licensing: adhitsatish@gmail.com
+See [LICENSE](LICENSE) for the full text.
 
 ---
 
