@@ -3,7 +3,7 @@
 **The companion's output is a starting point, not a settled answer.** Every criterion the companion pre-fills must still be reviewed and confirmed by a researcher before it counts. Rubber-stamping companion output erases the "human confirms evidence" step the framework is built on. The calculator's import rule (current state wins) guarantees the tool never overwrites an answer you have already entered, but nothing stops a researcher from importing and confirming without looking. That responsibility sits with the researcher.
 
 ## What is in this folder
-- `index.html` - the VISTA calculator. Open by double-click, runs fully offline, zero tokens, deterministic. Methodology and instrument authored by Adhit Satish.
+- `VISTA.html` - the VISTA calculator. Open by double-click, runs fully offline, zero tokens, deterministic. Methodology and instrument authored by Adhit Satish.
 - `companion.py` - optional evidence-gatherer that pre-fills the deterministic subset of [A] criteria.
 - `BUILD-INSTRUCTIONS.md` - the build spec the calculator was built from.
 
@@ -38,7 +38,7 @@ py companion.py --url https://brand.com --product-url https://brand.com/models/x
 Output: `[brand-domain]-companion-[date].json` with two blocks, `answers` (the pre-filled criteria) and `evidence` (one line per criterion recording what was fetched and why the answer landed, paste-ready for reports).
 
 ## Importing into the calculator
-Open `index.html`, go to the Summary tab, click Import JSON, pick the companion output. Pre-filled checkboxes tick. Any criterion you had already answered keeps your answer; discarded import values are logged in the browser console (F12).
+Open `VISTA.html`, go to the Summary tab, click Import JSON, pick the companion output. Pre-filled checkboxes tick. Any criterion you had already answered keeps your answer; discarded import values are logged in the browser console (F12).
 
 ## Failure modes
 - PSI down or key invalid: PSI criteria are skipped with a reason line, everything else still runs.

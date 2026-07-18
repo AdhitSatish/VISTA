@@ -48,7 +48,7 @@ A single HTML file. No dependencies. No build step. Runs offline by double-click
 - JSON export/import with shallow-merge (current state always wins)
 - Print / PDF export
 
-**To run:** Open `03_Calculator/index.html` in Chrome or Edge.
+**To run:** Open `03_Calculator/VISTA.html` in Chrome or Edge.
 
 **To verify math:** `py 03_Calculator/verify.py` (requires Python 3). Must pass 75/75.
 
@@ -77,7 +77,7 @@ VISTA/
     thresholds.md           Pass/fail thresholds with citations
     sources.md              Research citations
   03_Calculator/
-    index.html              THE CALCULATOR (single file, all logic inline)
+    VISTA.html              THE CALCULATOR (single file, all logic inline)
     verify.py               75-check math verifier
     companion.py            Auto-fill helper for [A] criteria (no API key needed for most)
     README.md               Companion usage guide
@@ -95,7 +95,7 @@ VISTA/
 
 - **Deterministic.** Same inputs, same output. No randomness, no AI in the scoring loop.
 - **Outside-in.** Every criterion is publicly observable. No internal access ever needed.
-- **Single file.** `index.html` contains everything. No npm, no CDN, no build step.
+- **Single file.** `VISTA.html` contains everything. No npm, no CDN, no build step.
 - **No localStorage.** State lives in memory. Persist via JSON export.
 - **Universal question set.** No per-client modifications. Applicability managed by sector flags.
 
