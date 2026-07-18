@@ -1,13 +1,13 @@
-MIT License
+MIT License (Modified)
 
 Copyright (c) 2026 Adhit Satish
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+to use, copy, modify, merge, publish, and distribute copies of the Software,
+and to permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
 
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
@@ -19,6 +19,23 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+ADDITIONAL TERMS
+
+NO SALE: VISTA may not be sold, licensed for a fee, or offered as a paid
+product or service in its original or derivative form. It is free. It stays
+free. Using VISTA as part of a professional workflow (running audits for
+clients, incorporating it into broader work) is permitted. Charging for VISTA
+itself, or repackaging it as something you sell, is not.
+
+ETHICAL USE: This software may not be used for illegal activities or to cause
+harm to individuals or groups.
+
+NO ENDORSEMENT: The names "VISTA" and "Adhit Satish" may not be used to
+endorse, promote, or imply association with any product, service, or activity
+without prior written permission from the author.
 
 ---
 
